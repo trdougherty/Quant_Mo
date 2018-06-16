@@ -1,0 +1,2 @@
+sudo rsync pi@25.50.9.64:~/Quant_Motion_Analysis/ .
+sleep 30
