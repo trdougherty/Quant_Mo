@@ -5,7 +5,8 @@ from __future__ import print_function
 ## reference
 # - http://www.pyimagesearch.com/2015/03/30/accessing-the-raspberry-pi-camera-with-opencv-and-python/
 # - http://stackoverflow.com/questions/2601194/displaying-a-webcam-feed-using-opencv-and-python
-# - http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_gui/py_video_display/py_video_display.html
+# - http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_gui/py_video_display/
+# py_video_display.html
 
 import time
 import cv2
@@ -35,13 +36,15 @@ ap.add_argument("-f", "--fps", type=int, default=17,
 	help="FPS of output video")
 ap.add_argument("-c", "--codec", type=str, default="MJPG",
 	help="codec of output video")
+ap.add_argument("-p", "--polar", help="Use this to store a visual cue of motion",
+                    action="store_true")
 args = vars(ap.parse_args())
 
 # These will be used for developing the motion vectors required to capture user motion
 (h, w) = (None, None)
 zeros = None
 
-def main():
+def main()
 	#Now we have the appropriate video file retrieval information under cap
     t0 = time.time()
     cap = cv2.VideoCapture(args["input"])
@@ -67,7 +70,8 @@ def main():
             writer = cv2.VideoWriter(args["output"], fourcc, args["fps"], (w, h), True)
 
         if ret == True:
-            #Sets the time for Analysis. This includes graying the image, building empty motion array, and applying motion vector analysis.
+            #Sets the time for Analysis. This includes graying the image, 
+            # building empty motion array, and applying motion vector analysis.
             t2 = time.time()
             #Builds the timing interval for the retrieval
             output = np.zeros((h, w, 3), dtype="uint8")

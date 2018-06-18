@@ -1,11 +1,14 @@
 # Better samples/python2/opt_flow.py
 
 ## reference
-# - http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_video/py_lucas_kanade/py_lucas_kanade.html
+# - http://opencv-python-tutroals.readthedocs.io/en/latest/
+# py_tutorials/py_video/py_lucas_kanade/py_lucas_kanade.html
 
 ## class diagram
 # http://www.yuml.me/diagram/scruffy/class/draw
-# [IOpticalFlow]^[DenseOpticalFlow],[IOpticalFlow]^[LucasKanadeOpticalFlow], [DenseOpticalFlow]^[DenseOpticalFlowByHSV],[DenseOpticalFlow]^[DenseOpticalFlowByLines],[DenseOpticalFlow]^[DenseOpticalFlowByWarp]
+# [IOpticalFlow]^[DenseOpticalFlow],[IOpticalFlow]^[LucasKanadeOpticalFlow], 
+# [DenseOpticalFlow]^[DenseOpticalFlowByHSV],[DenseOpticalFlow]
+# ^[DenseOpticalFlowByLines],[DenseOpticalFlow]^[DenseOpticalFlowByWarp]
 
 import numpy as np
 import cv2
@@ -27,27 +30,36 @@ class DenseOpticalFlow(IOpticalFlow):
     def set1stFrame(self, frame):
         self.prev = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         self.hsv = np.zeros_like(frame)
-        self.hsv[..., 1] = 255
+        print("The shape we're using is: {}".format(self.hsv.shape))
+        print("Sup")
+        self.hsv[..., 1] = 255 #What does this even do
 
     def apply(self, frame):
         next = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        flow = cv2.calcOpticalFlowFarneback(self.prev, next, None,
+        #After this next line we can start using the updated getFlow command
+        self.flow = cv2.calcOpticalFlowFarneback(self.prev, next, None,
                                             0.5, 3, 15, 3, 5, 1.2, 0)
 
-        result = self.makeResult(next, flow)
+        result = self.makeResult(next, self.flow)
         self.prev = next
         return result
+    
+    def getFlow(self):
+        return self.flow
 
     def makeResult(self, grayFrame, flow):
         '''Replace this for each expression'''
-        return frame.copy()
+        return flow
 
 class DenseOpticalFlowByHSV(DenseOpticalFlow):
     def makeResult(self, grayFrame, flow):
+        print(flow[...,0])
+        #   for c, i in enumerate(flow[2]):
+        #   print("Index is: {}\tValue is: {}".format(c,i))
         mag, ang = cv2.cartToPolar(flow[...,0], flow[...,1])
         self.hsv[...,0] = ang*180/np.pi/2
-        self. hsv[...,2] = cv2.normalize(mag, None, 0, 255, cv2.NORM_MINMAX)
+        self.hsv[...,2] = cv2.normalize(mag, None, 0, 255, cv2.NORM_MINMAX)
         return cv2.cvtColor(self.hsv, cv2.COLOR_HSV2BGR)
 
 class DenseOpticalFlowByLines(DenseOpticalFlow):
@@ -132,10 +144,13 @@ def CreateOpticalFlow(type):
         return DenseOpticalFlowByWarp()
     def lucas_kanade():
         return LucasKanadeOpticalFlow()
+    def default():
+        return DenseOpticalFlow()
     return {
         'dense_hsv': dense_by_hsv,
         'dense_lines': dense_by_lines,
         'dense_warp': dense_by_warp,
-        'lucas_kanade': lucas_kanade
+        'lucas_kanade': lucas_kanade,
+        '' : default
     }.get(type, dense_by_lines)()
     

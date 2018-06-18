@@ -106,3 +106,7 @@ venv.bak/
 # Files to ignore
 videos/
 data/
+.DS_Store
+*.jpg
+*.avi
+SANDBOX/
