@@ -110,3 +110,6 @@ data/
 *.jpg
 *.avi
 SANDBOX/
+*.npy
+*.h5
+*.p
