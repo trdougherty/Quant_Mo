@@ -15,6 +15,7 @@ import numpy as np
 #from imutils.video import VideoStream
 #import imutils
 import argparse
+import tables
 
 usage_text = '''
 Flags:
@@ -30,6 +31,8 @@ Hit ESC to exit.
 ap = argparse.ArgumentParser()
 ap.add_argument("-o", "--output", required=True,
 	help="path to output video file")
+ap.add_argument("-r","--raw_file", required=True,
+    help="Provides a path to save the raw file form")
 ap.add_argument("-i", "--input", required=True,
 	help="path to input video file")
 ap.add_argument("-f", "--fps", type=int, default=17,
@@ -44,7 +47,7 @@ args = vars(ap.parse_args())
 (h, w) = (None, None)
 zeros = None
 
-def main()
+def main():
 	#Now we have the appropriate video file retrieval information under cap
     t0 = time.time()
     cap = cv2.VideoCapture(args["input"])
@@ -63,8 +66,8 @@ def main()
             of.set1stFrame(frame)
             initialized = True
             ret, frame = cap.read() #Sets the frames again to appropriately build the first set
-		#Builds the appropriate writing print_function
-        if writer is None:
+		#Builds the appropriate writing print_function, given that we want to write polar
+        if writer is None and args["polar"]:
             print(frame.shape[:2])
             (h, w) = frame.shape[:2]
             writer = cv2.VideoWriter(args["output"], fourcc, args["fps"], (w, h), True)
@@ -74,7 +77,6 @@ def main()
             # building empty motion array, and applying motion vector analysis.
             t2 = time.time()
             #Builds the timing interval for the retrieval
-            output = np.zeros((h, w, 3), dtype="uint8")
             motion_img = of.apply(frame)
             #cv2.putText(motion_img,"Hello World!!!", (20,20), cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
             #x = [motion_img[x,:,:].sum() for x in range(motion_img.shape[0])]
@@ -91,14 +93,17 @@ def main()
             print("Variance of the matrix:\t{}".format(variance))
             #cv2.imshow('image',motion_img)
             if variance > 6000:
-                writer.write(motion_img)
+                if args["polar"]: writer.write(motion_img)
+                h5file = tables.open_file(args["raw_file", "a+", driver="H5FD_CORE")
+                
+
 
             print("Photo storage:\t\t{} seconds".format(time.time()-t3))
 
             print(" ") #For spacing
         else:
             break
-    writer.release()
+    if args["polar"]: writer.release()
     cv2.destroyAllWindows()
     print("Total time:\t\t{} seconds".format(time.time()-t0))
 
