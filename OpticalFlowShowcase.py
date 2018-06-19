@@ -30,9 +30,8 @@ class DenseOpticalFlow(IOpticalFlow):
     def set1stFrame(self, frame):
         self.prev = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         self.hsv = np.zeros_like(frame)
-        print("The shape we're using is: {}".format(self.hsv.shape))
-        print("Sup")
-        self.hsv[..., 1] = 255 #What does this even do
+        self.hsv[..., 1] = 255 #What does this even 
+        self.passes = 0
 
     def apply(self, frame):
         next = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -43,10 +42,11 @@ class DenseOpticalFlow(IOpticalFlow):
 
         result = self.makeResult(next, self.flow)
         self.prev = next
+        self.passes += 1
         return result
     
     def getFlow(self):
-        return self.flow
+        return [self.flow, self.passes]
 
     def makeResult(self, grayFrame, flow):
         '''Replace this for each expression'''
@@ -54,7 +54,6 @@ class DenseOpticalFlow(IOpticalFlow):
 
 class DenseOpticalFlowByHSV(DenseOpticalFlow):
     def makeResult(self, grayFrame, flow):
-        print(flow[...,0])
         #   for c, i in enumerate(flow[2]):
         #   print("Index is: {}\tValue is: {}".format(c,i))
         mag, ang = cv2.cartToPolar(flow[...,0], flow[...,1])

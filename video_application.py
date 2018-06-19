@@ -66,9 +66,10 @@ def main():
             of.set1stFrame(frame)
             initialized = True
             ret, frame = cap.read() #Sets the frames again to appropriately build the first set
+            flowSum = np.zeros(frame.shape[0],frame.shape[1],2) # this would need to be MANUALLY set for another size of flow vectors
+
 		#Builds the appropriate writing print_function, given that we want to write polar
         if writer is None and args["polar"]:
-            print(frame.shape[:2])
             (h, w) = frame.shape[:2]
             writer = cv2.VideoWriter(args["output"], fourcc, args["fps"], (w, h), True)
 
@@ -78,6 +79,7 @@ def main():
             t2 = time.time()
             #Builds the timing interval for the retrieval
             motion_img = of.apply(frame)
+
             #cv2.putText(motion_img,"Hello World!!!", (20,20), cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
             #x = [motion_img[x,:,:].sum() for x in range(motion_img.shape[0])]
             #print(x)
@@ -94,12 +96,10 @@ def main():
             #cv2.imshow('image',motion_img)
             if variance > 6000:
                 if args["polar"]: writer.write(motion_img)
-                h5file = tables.open_file(args["raw_file", "a+", driver="H5FD_CORE")
                 
 
-
+                #h5file = tables.open_file(args["raw_file"], "a", driver="H5FD_CORE") #Not sure if this works...
             print("Photo storage:\t\t{} seconds".format(time.time()-t3))
-
             print(" ") #For spacing
         else:
             break
