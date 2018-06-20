@@ -42,11 +42,10 @@ class DenseOpticalFlow(IOpticalFlow):
 
         result = self.makeResult(next, self.flow)
         self.prev = next
-        self.passes += 1
         return result
     
     def getFlow(self):
-        return [self.flow, self.passes]
+        return self.flow
 
     def makeResult(self, grayFrame, flow):
         '''Replace this for each expression'''

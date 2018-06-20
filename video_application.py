@@ -16,6 +16,8 @@ import numpy as np
 #import imutils
 import argparse
 import tables
+from datetime import datetime
+import pandas as pd
 
 usage_text = '''
 Flags:
@@ -66,7 +68,8 @@ def main():
             of.set1stFrame(frame)
             initialized = True
             ret, frame = cap.read() #Sets the frames again to appropriately build the first set
-            flowSum = np.zeros(frame.shape[0],frame.shape[1],2) # this would need to be MANUALLY set for another size of flow vectors
+            iterations = 0
+            flowSum = np.zeros([frame.shape[0],frame.shape[1],2]) # this would need to be MANUALLY set for another size of flow vectors
 
 		#Builds the appropriate writing print_function, given that we want to write polar
         if writer is None and args["polar"]:
@@ -79,7 +82,6 @@ def main():
             t2 = time.time()
             #Builds the timing interval for the retrieval
             motion_img = of.apply(frame)
-
             #cv2.putText(motion_img,"Hello World!!!", (20,20), cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
             #x = [motion_img[x,:,:].sum() for x in range(motion_img.shape[0])]
             #print(x)
@@ -96,8 +98,11 @@ def main():
             #cv2.imshow('image',motion_img)
             if variance > 6000:
                 if args["polar"]: writer.write(motion_img)
+                iterations += 1
+                flowSum += of.getFlow() # This creates our summed numpy array
+                #for i in range(of.flow.shape[2]):
+                #    np.savetxt(args["raw_file"],of.flow[:,:,i])ˀ
                 
-
                 #h5file = tables.open_file(args["raw_file"], "a", driver="H5FD_CORE") #Not sure if this works...
             print("Photo storage:\t\t{} seconds".format(time.time()-t3))
             print(" ") #For spacing
@@ -106,6 +111,14 @@ def main():
     if args["polar"]: writer.release()
     cv2.destroyAllWindows()
     print("Total time:\t\t{} seconds".format(time.time()-t0))
+    
+    flowShape = flowSum.shape[:2] #Gets the size of the array that we need
+    flowSum = flowSum.astype(np.float16)
+    t = datetime.now().timestamp()
+
+    arrayStorage = np.array([t,iterations,x0,x1], dtype = object)
+    np.save(args["raw_file"], arrayStorage)
+
 
 if __name__ == '__main__':
     print(usage_text)
