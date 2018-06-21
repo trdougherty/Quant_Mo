@@ -15,6 +15,8 @@ import numpy as np
 #import imutils
 import argparse
 import io
+import sys
+import datetime
 
 usage_text = '''
 [INFO] Processing the divergence of the compressed motion photo...
@@ -22,13 +24,14 @@ usage_text = '''
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
-ap.add_argument("-o", "--output", required=True,
+ap.add_argument("-o", "--output", required=False,
 	help="path to output video file")
-ap.add_argument("-i", "--input", required=True,
+ap.add_argument("-i", "--input", required=False,
         help="path to input file")
 args = vars(ap.parse_args())
 
 ''' This is the process of converting motion to cartesian coordinates
+
 class DenseOpticalFlowByHSV(DenseOpticalFlow):
     def makeResult(self, grayFrame, flow):
         mag, ang = cv2.cartToPolar(flow[...,0], flow[...,1])
@@ -42,6 +45,28 @@ def main():
     name = args["input"]
     photo = cv2.imread(name)
 
+def process(file):
+    numObj = np.load(file)
+    [date, iter, ar1, ar2] = numObj
+    recompose = np.zeros([ar1.shape[0],ar1.shape[1],2])
+    recompose[:,:,0] = ar1
+    recompose[:,:,1] = ar2
+    return [date, iter, recompose]
+
+def humanDate(ts):
+    return datetime.datetime.fromtimestamp(ts)
+
+def fileImport():
+    imported = sys.stdin.read()
+    return imported.rstrip().split('\n')
+
 if __name__ == '__main__':
-    print(usage_text)
-    main()
+    files = fileImport()
+    [sumIter, sumArray] = process(files[0])[1:] #This gives us our first iterations and sum array
+    for i in files[1:]:
+        [iter, arr] = process(i)[1:]
+        sumIter += iter
+        sumArray += arr
+    
+    finalArr = sumArray / sumIter #This will give the final equivalent motion vector of the system
+    print(finalArr)    
