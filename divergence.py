@@ -17,10 +17,7 @@ import argparse
 import io
 import sys
 import datetime
-
-usage_text = '''
-[INFO] Processing the divergence of the compressed motion photo...
-'''
+from matplotlib import pyplot as plt
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
@@ -53,6 +50,8 @@ def process(file):
     recompose[:,:,1] = ar2
     return [date, iter, recompose]
 
+def distance(x1,x2,Arr): return np.absolute(Arr-x1)
+
 def humanDate(ts):
     return datetime.datetime.fromtimestamp(ts)
 
@@ -67,6 +66,11 @@ if __name__ == '__main__':
         [iter, arr] = process(i)[1:]
         sumIter += iter
         sumArray += arr
-    
-    finalArr = sumArray / sumIter #This will give the final equivalent motion vector of the system
-    print(finalArr)    
+
+    print(distance(3,10,sumArray))
+    #distArr = np.zeros(sumArray.shape[0],sumArray.shape[1])
+    #for i in sumArray.shape[0]:
+    #    for j in sumArray.shape[1]:
+    #        distArr[i][j] =
+
+    #finalArr = sumArray / sumIter #This will give the final equivalent motion vector of the system
