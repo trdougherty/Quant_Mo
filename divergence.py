@@ -27,15 +27,11 @@ ap.add_argument("-i", "--input", required=False,
         help="path to input file")
 args = vars(ap.parse_args())
 
-''' This is the process of converting motion to cartesian coordinates
-
-class DenseOpticalFlowByHSV(DenseOpticalFlow):
-    def makeResult(self, grayFrame, flow):
-        mag, ang = cv2.cartToPolar(flow[...,0], flow[...,1])
-        self.hsv[...,0] = ang*180/np.pi/2
-        self. hsv[...,2] = cv2.normalize(mag, None, 0, 255, cv2.NORM_MINMAX)
-        return cv2.cvtColor(self.hsv, cv2.COLOR_HSV2BGR)
-        '''
+def makeResult(self, grayFrame, flow):
+    mag, ang = cv2.cartToPolar(flow[...,0], flow[...,1])
+    self.hsv[...,0] = ang*180/np.pi/2
+    self. hsv[...,2] = cv2.normalize(mag, None, 0, 255, cv2.NORM_MINMAX)
+    return cv2.cvtColor(self.hsv, cv2.COLOR_HSV2BGR)
 
 def main():
     t0 = time.time()
@@ -50,7 +46,13 @@ def process(file):
     recompose[:,:,1] = ar2
     return [date, iter, recompose]
 
-def distance(x1,x2,Arr): return np.absolute(Arr-x1)
+def localize(point, x, y, mv = 0.08):
+    Z = 1/np.power(np.power(point[0]-x,2)+np.power(point[1]-y,2),0.5)
+    Z[ Z > max_val ] = mv
+    return Z*(1/max_val)
+
+def divergence(arr):
+
 
 def humanDate(ts):
     return datetime.datetime.fromtimestamp(ts)
@@ -67,7 +69,12 @@ if __name__ == '__main__':
         sumIter += iter
         sumArray += arr
 
-    print(distance(3,10,sumArray))
+    x_dist = np.arange(0,sumArray.shape[0])
+    y_dist = np.arange(0,sumArray.shape[1])
+
+    xx, yy = np.meshgrid(x_dist, y_dist)
+    print(xx)
+    # print(distance(3,10,sumArray))
     #distArr = np.zeros(sumArray.shape[0],sumArray.shape[1])
     #for i in sumArray.shape[0]:
     #    for j in sumArray.shape[1]:
