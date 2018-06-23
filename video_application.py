@@ -61,54 +61,59 @@ def main():
     writer = None
 
     while(cap.isOpened()):
-        ret, frame = cap.read()
-        if(initialized == False):
-        #Builds the appropriate optical flow
-            of = CreateOpticalFlow('dense_hsv') #dense_hsv')
-            of.set1stFrame(frame)
-            initialized = True
-            ret, frame = cap.read() #Sets the frames again to appropriately build the first set
-            iterations = 0
-            flowSum = np.zeros([frame.shape[0],frame.shape[1],2]) # this would need to be MANUALLY set for another size of flow vectors
+        try:
+            ret, frame = cap.read()
+            if(initialized == False):
+            #Builds the appropriate optical flow
+                of = CreateOpticalFlow('dense_hsv') #dense_hsv')
+                of.set1stFrame(frame)
+                initialized = True
+                ret, frame = cap.read() #Sets the frames again to appropriately build the first set
+                iterations = 0
+                flowSum = np.zeros([frame.shape[0],frame.shape[1],2]) # this would need to be MANUALLY set for another size of flow vectors
 
-		#Builds the appropriate writing print_function, given that we want to write polar
-        if writer is None and args["polar"]:
-            (h, w) = frame.shape[:2]
-            writer = cv2.VideoWriter(args["output"], fourcc, args["fps"], (w, h), True)
+            #Builds the appropriate writing print_function, given that we want to write polar
+            if writer is None and args["polar"]:
+                (h, w) = frame.shape[:2]
+                writer = cv2.VideoWriter(args["output"], fourcc, args["fps"], (w, h), True)
 
-        if ret == True:
-            #Sets the time for Analysis. This includes graying the image, 
-            # building empty motion array, and applying motion vector analysis.
-            t2 = time.time()
-            #Builds the timing interval for the retrieval
-            motion_img = of.apply(frame)
-            #cv2.putText(motion_img,"Hello World!!!", (20,20), cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
-            #x = [motion_img[x,:,:].sum() for x in range(motion_img.shape[0])]
-            #print(x)
-            #output[0:h, 0:w] = motion_img
+            if ret == True:
+                #Sets the time for Analysis. This includes graying the image, 
+                # building empty motion array, and applying motion vector analysis.
+                t2 = time.time()
+                #Builds the timing interval for the retrieval
+                motion_img = of.apply(frame)
+                #cv2.putText(motion_img,"Hello World!!!", (20,20), cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
+                #x = [motion_img[x,:,:].sum() for x in range(motion_img.shape[0])]
+                #print(x)
+                #output[0:h, 0:w] = motion_img
 
-            print("Analysis:\t\t{} seconds".format(time.time()-t2))
+                print("Analysis:\t\t{} seconds".format(time.time()-t2))
 
-            t3 = time.time()
-            #Builds a summed array of the color values for variance analysis in any direction
-            summed_colors = np.sum(motion_img,axis=2)
-            #Shows the image and computes the variance of the image
-            variance = np.var(summed_colors)
-            print("Variance of the matrix:\t{}".format(variance))
-            #cv2.imshow('image',motion_img)
-            if variance > 6000:
-                if args["polar"]: writer.write(motion_img)
-                iterations += 1
-                flowSum += of.getFlow() # This creates our summed numpy array
-                #for i in range(of.flow.shape[2]):
-                #    np.savetxt(args["raw_file"],of.flow[:,:,i])ˀ
-                
-                #h5file = tables.open_file(args["raw_file"], "a", driver="H5FD_CORE") #Not sure if this works...
-            print("Photo storage:\t\t{} seconds".format(time.time()-t3))
-            print(" ") #For spacing
-        else:
-            break
-    if args["polar"]: writer.release()
+                t3 = time.time()
+                #Builds a summed array of the color values for variance analysis in any direction
+                summed_colors = np.sum(motion_img,axis=2)
+                #Shows the image and computes the variance of the image
+                variance = np.var(summed_colors)
+                print("Variance of the matrix:\t{}".format(variance))
+                #cv2.imshow('image',motion_img)
+                if variance > 6000:
+                    if args["polar"]: writer.write(motion_img)
+                    iterations += 1
+                    flowSum += of.getFlow() # This creates our summed numpy array
+                    #for i in range(of.flow.shape[2]):
+                    #    np.savetxt(args["raw_file"],of.flow[:,:,i])ˀ
+                    
+                    #h5file = tables.open_file(args["raw_file"], "a", driver="H5FD_CORE") #Not sure if this works...
+                print("Photo storage:\t\t{} seconds".format(time.time()-t3))
+                print(" ") #For spacing
+            else:
+                break
+        except KeyboardInterrupt:
+            cv2.destroyAllWindows()
+            print("Process was Terminated.")
+
+    #if args["polar"]: writer.release()
     cv2.destroyAllWindows()
     print("Total time:\t\t{} seconds".format(time.time()-t0))
     
@@ -116,7 +121,7 @@ def main():
     flowSum = flowSum.astype(np.float16)
     t = datetime.now().timestamp()
 
-    arrayStorage = np.array([t,iterations,x0,x1], dtype = object)
+    arrayStorage = np.array([t,iterations,flowSum[:,:,0],flowSum[:,:,1]], dtype = object)
     np.save(args["raw_file"], arrayStorage)
 
 

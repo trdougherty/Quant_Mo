@@ -1,23 +1,17 @@
 from __future__ import print_function
-# Better samples/python2/opt_flow.py
-# for Raspberry Pi
-
-## reference
-# - http://www.pyimagesearch.com/2015/03/30/accessing-the-raspberry-pi-camera-with-opencv-and-python/
-# - http://stackoverflow.com/questions/2601194/displaying-a-webcam-feed-using-opencv-and-python
-# - http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_gui/py_video_display/py_video_display.html
-
 import time
 import cv2
 from OpticalFlowShowcase import *
 import numpy as np
-#from imutils.video import VideoStream
-#import imutils
 import argparse
 import io
 import sys
 import datetime
 from matplotlib import pyplot as plt
+from mpl_toolkits import mplot3d
+
+#Variables of interest
+axis = 1
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
@@ -48,11 +42,11 @@ def process(file):
 
 def localize(point, x, y, mv = 0.08):
     Z = 1/np.power(np.power(point[0]-x,2)+np.power(point[1]-y,2),0.5)
-    Z[ Z > max_val ] = mv
-    return Z*(1/max_val)
+    Z[ Z > mv ] = mv
+    return Z*(1/mv)
 
-def divergence(arr):
-
+# This will give use the divergence of the array which we can use for localizing later
+def divergence(array): return np.gradient(array) #np.add.reduce(np.gradient(array))
 
 def humanDate(ts):
     return datetime.datetime.fromtimestamp(ts)
@@ -73,7 +67,18 @@ if __name__ == '__main__':
     y_dist = np.arange(0,sumArray.shape[1])
 
     xx, yy = np.meshgrid(x_dist, y_dist)
-    print(xx)
+    ##print(divergence(sumArray)[2][10])
+    A = divergence(sumArray[:,:,axis])
+    Z = np.dot(A[axis],sumArray[:,:,axis])
+    fig = plt.figure()
+    ax = plt.axes(projection='3d')
+    ax.contour3D(xx, yy, Z, 50, cmap='binary') #'binary')
+    ax.view_init(elev=27., azim=-44)
+    ax.set_title('{} Axis'.format(axis))
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_zlabel('z')
+    plt.show()
     # print(distance(3,10,sumArray))
     #distArr = np.zeros(sumArray.shape[0],sumArray.shape[1])
     #for i in sumArray.shape[0]:
