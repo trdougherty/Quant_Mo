@@ -16,7 +16,10 @@ axis = 0
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-o", "--output", required=False,
-	help="path to output video file")
+	help="path to output video file"),
+ap.add_argument("-diff", "--difference", required=False, dest='difference', action='store_true',
+    help="yields discrepancy between arrays")
+ap.set_defaults(difference=False)
 args = vars(ap.parse_args())
 
 def process(file):
@@ -26,6 +29,14 @@ def process(file):
     recompose[:,:,0] = ar1
     recompose[:,:,1] = ar2
     return [date, iteration, recompose]
+
+def f_process(file):
+    numObj = np.load(file)
+    [date, ar1, ar2] = numObj
+    recompose = np.zeros([ar1.shape[0],ar1.shape[1],2])
+    recompose[:,:,0] = ar1
+    recompose[:,:,1] = ar2
+    return [date, recompose]
 
 # Not really needed for this
 def localize(point, x, y, mv = 0.08): 
@@ -58,6 +69,7 @@ def printArr(arr, axis):
     ax.set_xlabel('x')
     ax.set_ylabel('y')
     ax.set_zlabel('z')
+    ax.set_zlim(-1,1)
     plt.show()
     return
 
@@ -74,21 +86,29 @@ def saveArr(x):
 
 
 if __name__ == '__main__':
+    diff = args["difference"]
     files = fileImport()
     dates = []
-    [date, sumIter, sumArray] = process(files[0]) #This gives us our first iterations and sum array
-    dates.append(date)
 
-    for i in files[1:]:
-        [temp_date, ite, arr] = process(i)
-        dates.append(temp_date)
-        sumIter += ite
-        sumArray += arr
+    print("Output is:\t{}".format(args["output"]))
 
-    motionArr = sumArray / sumIter #KEY LINE
+    if diff:
+        assert len(files) >= 2
+        [a_date, a_arr] = f_process(files[0])
+        [b_date, b_arr] = f_process(files[1])
+        motionArr = b_arr - a_arr
+    else:
+        [date, sumIter, sumArray] = process(files[0]) #This gives us our first iterations and sum array
+        dates.append(date)
+        for i in files[1:]:
+            [temp_date, ite, arr] = process(i)
+            dates.append(temp_date)
+            sumIter += ite
+            sumArray += arr
+        motionArr = sumArray / sumIter #KEY LINE
 
     # Allows us to work with the shape off the photo we're looking at
     printArr(motionArr, axis)
 
-    #Finally saves the array
+    # Finally saves the array
     saveArr(motionArr)
