@@ -6,7 +6,7 @@
 
 ## class diagram
 # http://www.yuml.me/diagram/scruffy/class/draw
-# [IOpticalFlow]^[DenseOpticalFlow],[IOpticalFlow]^[LucasKanadeOpticalFlow], 
+# [IOpticalFlow]^[DenseOpticalFlow],[IOpticalFlow]^[LucasKanadeOpticalFlow],
 # [DenseOpticalFlow]^[DenseOpticalFlowByHSV],[DenseOpticalFlow]
 # ^[DenseOpticalFlowByLines],[DenseOpticalFlow]^[DenseOpticalFlowByWarp]
 
@@ -30,7 +30,7 @@ class DenseOpticalFlow(IOpticalFlow):
     def set1stFrame(self, frame):
         self.prev = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         self.hsv = np.zeros_like(frame)
-        self.hsv[..., 1] = 255 #What does this even 
+        self.hsv[..., 1] = 255 #What does this even
         self.passes = 0
 
     def apply(self, frame):
@@ -43,7 +43,7 @@ class DenseOpticalFlow(IOpticalFlow):
         result = self.makeResult(next, self.flow)
         self.prev = next
         return result
-    
+
     def getFlow(self):
         return self.flow
 
@@ -151,4 +151,4 @@ def CreateOpticalFlow(type):
         'lucas_kanade': lucas_kanade,
         '' : default
     }.get(type, dense_by_lines)()
-    
+
