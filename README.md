@@ -2,46 +2,25 @@
 OpenCV OpticalFlow Showcase
 ===========================
 
-## About
-This is sample code for trying methods of computer vision called [Optical Flow](https://en.wikipedia.org/wiki/Optical_flow) casually with [OpenCV](http://opencv.org).
+## Usage
 
-This is better version of 'samples/python2/opt_flow.py' included in OpenCV.
-Features:
-- Switchable to 4 type of optical flow methods.
-- Not accumulating 'flow' for easy understanding. 
-- Flipping video image horizontally for the use with webcam.
-- Summarized code for each methods.
-- (new) Raspberry Pi support.
+This system looks for a file in the home directory called "name". Its contents will be appended to all data to help with data organization of the scientist.
+
+In the Quant_Mo directory, make sure you have the opencv packages installed, modify the camera system if needed (this system uses a raspberrypi with Adafruit camera)
+
+To run motion system:
+bash whole_process.sh name_of_process
+
+To run motion analysis:
+ls directory_you_want_to_study | python analysis.py
+
+This command^ will spit out a compressed system of analysis measurements and can even graph your results if you have matplotlib and 3d plotting utilities
+
+## About
+
+This system is a comprehensive guide for collecting and analyzing motion data in a systematic way. The purpose of this work is as an architectural tool for assesment of human movement patterns. This particular example is a proof of concept, using a raspberrypi with a camera as a recording instrument and a microwave diffraction sensor for broad motion filtering.
 
 ## Example
-
-- Gunnar-Farneback method: By HSV
-
-![HSV](https://github.com/daisukelab/cv_opt_flow/blob/master/sample_result/hsv.png "HSV") ![HSV SRC](https://github.com/daisukelab/cv_opt_flow/blob/master/sample_result/hsv_src.png "HSV Source")
-
-- Gunnar-Farneback method: By lines
-
-![LINES](https://github.com/daisukelab/cv_opt_flow/blob/master/sample_result/lines.png "LINES") ![LINES SRC](https://github.com/daisukelab/cv_opt_flow/blob/master/sample_result/lines_src.png "LINES Source")
-
-- Gunnar-Farneback method: By warping
-
-![WARP](https://github.com/daisukelab/cv_opt_flow/blob/master/sample_result/warp.png "WARP") ![WARP SRC](https://github.com/daisukelab/cv_opt_flow/blob/master/sample_result/warp_src.png "WARP Source")
-
-- Lucas-Kanade method
-
-![Lucas-Kanade](https://github.com/daisukelab/cv_opt_flow/blob/master/sample_result/lk.png "Lucas-Kanade")
-
-## Tested Environment
-(Mac)
-- MacOS X El Capitan
-- python 2.7.10
-- OpenCV3 3.1.0
-
-(Raspberry Pi)
-- Raspberry Pi 2
-- Ubuntu 14.04.4 LTS (trusty)
-- python 2.7.6
-- OpenCV3 3.0.0
 
 ## Running this sample
 For Mac/PC, simply run main.py.
@@ -52,32 +31,7 @@ For Raspberry Pi, run raspi_main.py.
 
     $ python raspi_main.py
 
-Usage will be shown as below.
-
-    Hit followings to switch to:
-    1 - Dense optical flow by HSV color image (default);
-    2 - Dense optical flow by lines;
-    3 - Dense optical flow by warped image;
-    4 - Lucas-Kanade method.
-
-    Hit 's' to save image.
-
-    Hit 'f' to flip image horizontally.
-
-    Hit ESC to exit.
-
-* For Mac/PC, click on the preview window to enter commands.
-
 ## About code
-| file | description |
-|------|-------------|
-|main.py|Main to run this sample.|
-|raspi_main.py|Main for Raspberry Pi.|
-|OpticalFlowShowcase.py|Optical flow sample body.|
-
-OpticalFlowShowcase.py has following classes.
-
-![Class diagram](https://github.com/daisukelab/cv_opt_flow/blob/master/classOFS.png "Class diagram")
 =======
 # Quant_Mo
 Quantitative Motion Analysis

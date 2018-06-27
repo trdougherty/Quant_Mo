@@ -2,6 +2,7 @@ from matplotlib import pyplot as plt
 from mpl_toolkits import mplot3d
 import numpy as np
 import math
+import progressbar
 
 start = 0; end = 64
 max_val = 0.3
@@ -47,7 +48,7 @@ ax.contour3D(xx, yy, ZL, 50, cmap='binary')
 ax.view_init(elev=27., azim=-44)
 ax.set_xlabel('x')
 ax.set_ylabel('y')
-ax.set_zlabel('z');
+ax.set_zlabel('z')
 plt.show()
 
 #plt.colored(cp)
