@@ -78,7 +78,7 @@ def main():
                 writer = cv2.VideoWriter(args["output"], fourcc, args["fps"], (w, h), True)
 
             if ret == True:
-                #Sets the time for Analysis. This includes graying the image, 
+                #Sets the time for Analysis. This includes graying the image,
                 # building empty motion array, and applying motion vector analysis.
                 t2 = time.time()
                 #Builds the timing interval for the retrieval
@@ -102,8 +102,8 @@ def main():
                     iterations += 1
                     flowSum += of.getFlow() # This creates our summed numpy array
                     #for i in range(of.flow.shape[2]):
-                    #    np.savetxt(args["raw_file"],of.flow[:,:,i])ˀ
-                    
+                    #np.savetxt(args["raw_file"],of.flow[:,:,i])
+
                     #h5file = tables.open_file(args["raw_file"], "a", driver="H5FD_CORE") #Not sure if this works...
                 print("Photo storage:\t\t{} seconds".format(time.time()-t3))
                 print(" ") #For spacing
@@ -116,7 +116,7 @@ def main():
     #if args["polar"]: writer.release()
     cv2.destroyAllWindows()
     print("Total time:\t\t{} seconds".format(time.time()-t0))
-    
+
     flowShape = flowSum.shape[:2] #Gets the size of the array that we need
     flowSum = flowSum.astype(np.float16)
     t = datetime.now().timestamp()
