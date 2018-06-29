@@ -117,7 +117,7 @@ def main():
 
     flowShape = flowSum.shape[:2] #Gets the size of the array that we need
     flowSum = flowSum.astype(np.float16)
-    t = datetime.now().timestamp()
+    t = str(datetime.now())
 
     arrayStorage = np.array([t,iterations,flowSum[:,:,0],flowSum[:,:,1]], dtype = object)
     np.save(args["raw_file"], arrayStorage)
