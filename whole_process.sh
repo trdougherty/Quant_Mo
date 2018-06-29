@@ -9,7 +9,7 @@ motion=_motion.avi
 #compile=_compiled.jpg
 
 GEN_NAME=$(cat name)
-time_s=$(date "+%D_%H:%M:%S")
+time_s=$(date +%Y-%m-%d.%H:%M:%S)
 
 if [[ -n $1 ]];then
     name=$1
