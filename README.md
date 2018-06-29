@@ -16,6 +16,8 @@ To run one pass of the motion collection system:
 
     $ bash whole_process experiment_name
 
+* Note -- to gain any real insight you'll want to loop this^. In my experiment, I ran this command if generic motion was detected in the area.
+
 To run motion analysis:
 
     $ ls directory_you_want_to_study | python analysis.py
