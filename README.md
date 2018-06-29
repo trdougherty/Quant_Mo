@@ -6,13 +6,19 @@ OpenCV OpticalFlow Showcase
 
 This system looks for a file in the home directory called "name". Its contents will be appended to all data to help with data organization of the scientist.
 
+    $ echo 'name_of_device' > name
+
 In the Quant_Mo directory, make sure you have the opencv packages installed, modify the camera system if needed (this system uses a raspberrypi with Adafruit camera)
 
-To run motion system:
-bash whole_process.sh name_of_process
+    $ pip install -r requirements.txt
+
+To run one pass of the motion collection system:
+
+    $ bash whole_process experiment_name
 
 To run motion analysis:
-ls directory_you_want_to_study | python analysis.py
+
+    $ ls directory_you_want_to_study | python analysis.py
 
 This command^ will spit out a compressed system of analysis measurements and can even graph your results if you have matplotlib and 3d plotting utilities
 
