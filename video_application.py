@@ -15,9 +15,7 @@ import numpy as np
 #from imutils.video import VideoStream
 #import imutils
 import argparse
-import tables
 from datetime import datetime
-import pandas as pd
 
 usage_text = '''
 Flags:
