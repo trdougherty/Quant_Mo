@@ -1,6 +1,3 @@
+mkdir -p videos
+sudo rsync -azP pi@raspberrypi.local:~/Quant_Mo/videos/$1/ ./videos/$1 --delete
 
-while :
-do
-sudo rsync -azP pi@raspberrypi.local:~/Quant_Motion_Analysis/tests/ ./test_files
-sleep 30
-done

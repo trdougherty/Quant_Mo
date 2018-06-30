@@ -6,7 +6,7 @@ import numpy as np
 import argparse
 import io
 import sys
-import datetime 
+import datetime
 from matplotlib import pyplot as plt
 from mpl_toolkits import mplot3d
 
@@ -23,7 +23,7 @@ ap.set_defaults(difference=False)
 args = vars(ap.parse_args())
 
 def process(file):
-    numObj = np.load(file)
+    numObj = np.load(file, encoding = 'latin1')
     [date, iteration, ar1, ar2] = numObj
     recompose = np.zeros([ar1.shape[0],ar1.shape[1],2])
     recompose[:,:,0] = ar1
@@ -39,7 +39,7 @@ def f_process(file):
     return [date, recompose]
 
 # Not really needed for this
-def localize(point, x, y, mv = 0.08): 
+def localize(point, x, y, mv = 0.08):
     Z = 1/np.power(np.power(point[0]-x,2)+np.power(point[1]-y,2),0.5)
     Z[ Z > mv ] = mv
     return Z*(1/mv)
@@ -62,6 +62,10 @@ def printArr(arr, axis):
     xx, yy = np.meshgrid(x_dist, y_dist)
     Z = arr[:,:,axis]
 
+    min_ = -1; max_ = 1 # This is the default value
+    if (Z.min() < -1): min_ = Z.min()
+    if (Z.max() > 1): max_ = Z.max()
+
     fig = plt.figure()
     ax = plt.axes(projection='3d')
     ax.contour3D(xx, yy, Z, arr.shape[0], cmap='binary')
@@ -69,7 +73,7 @@ def printArr(arr, axis):
     ax.set_xlabel('x')
     ax.set_ylabel('y')
     ax.set_zlabel('z')
-    ax.set_zlim(-1,1)
+    ax.set_zlim(min_,max_)
     plt.show()
     return
 
@@ -88,6 +92,7 @@ def saveArr(x):
 if __name__ == '__main__':
     diff = args["difference"]
     files = fileImport()
+    print("Files are:\t{}".format(files))
     dates = []
 
     print("Output is:\t{}".format(args["output"]))
@@ -103,9 +108,13 @@ if __name__ == '__main__':
         for i in files[1:]:
             [temp_date, ite, arr] = process(i)
             dates.append(temp_date)
+            print("Sum of iterations is:\t{}".format(sumIter))
             sumIter += ite
             sumArray += arr
+
+        print("Final number of iterations is:\t{}".format(sumIter))
         motionArr = sumArray / sumIter #KEY LINE
+        # motionArr = normalize(motionArr)
 
     # Allows us to work with the shape off the photo we're looking at
     printArr(motionArr, axis)
