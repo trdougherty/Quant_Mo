@@ -17,6 +17,9 @@ import numpy as np
 #import imutils
 import argparse
 import io
+import signal
+import os
+import sys
 
 usage_text = '''
 Pass -t to specifiy time of recording at command line
@@ -24,10 +27,26 @@ Pass -t to specifiy time of recording at command line
 Pass
 Hit 's' to save image.
 
-Hit 'f' to flip image horizontally.
-
 Hit ESC to exit.
 '''
+# Sets video writing variable for future use
+writer = None
+camera = None
+
+def signal_handler(signal, frame):
+    print('System is gracefully exiting..')
+    if writer is not None:
+        writer.release()
+        print('Closed video writing system')
+    if camera is not None:
+        camera.close()
+        print('Closed camera')
+    print('Closing file....')
+    sys.exit(0)
+
+# These prep the system for interrupts
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGALRM, signal_handler)
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
@@ -44,10 +63,7 @@ ap.add_argument("-c", "--codec", type=str, default="MJPG",
 args = vars(ap.parse_args())
 
 # initialize the video stream and allow the camera
-# sensor to warmup
 print("[INFO] warming up camera...")
-#vs = VideoStream(usePiCamera=args["picamera"] > 0).start()
-#time.sleep(2.0)
 
 res_x = 64
 res_y = 64
@@ -63,7 +79,6 @@ lastTime = time.time()*100.0
 # initialize the FourCC, video writer, dimensions of the frame, and
 # zeros array
 fourcc = cv2.VideoWriter_fourcc(*args["codec"])
-writer = None
 
 #These will be used for developing the motion vectors required to capture user motion
 (h, w) = (None, None)

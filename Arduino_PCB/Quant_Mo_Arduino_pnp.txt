@@ -1,0 +1,31 @@
+*Pick And Place List
+*Company=
+*Author=
+*eMail=
+*
+*Project=Quant_Mo_Arduino
+*Date=10:11:36
+*CreatedBy=Fritzing 0.9.3b.04.19.5c895d327c44a3114e5fcc9d8260daf0cbb52806
+*
+*
+*Coordinates in mm, always center of component
+*Origin 0/0=Lower left corner of PCB
+*Rotation in degree (0-360, math. pos.)
+*
+*No;Value;Package;X;Y;Rotation;Side;Name
+1;;;14.8559;-26.9663;0;Bottom;Part1
+2;;;2.7432;-6.8024;0;Bottom;Via5
+3;1k;THT;32.6359;-11.7347;0;Bottom;R6
+4;;THT;23.7459;-4.11474;0;Bottom;R1
+5;;;33.2508;-34.2608;0;Bottom;Part2
+6;;;31.3944;-1.316;0;Bottom;Via2
+7;;;31.3944;-34.844;0;Bottom;Via1
+8;;;23.4696;-49.4744;0;Bottom;Via3
+9;;;23.4696;-4.9736;0;Bottom;Via6
+10;1k;THT;32.6359;-9.19474;0;Bottom;R8
+11;1k;THT;32.6359;-16.8147;0;Bottom;R2
+12;;;30.1752;-29.3576;0;Bottom;Via4
+13;;THT;4.6959;-28.2447;90;Bottom;R3
+14;;THT;23.7459;-49.8347;0;Bottom;R5
+15;1k;THT;32.6359;-14.2747;0;Bottom;R4
+16;;THT;40.2559;-28.2447;90;Bottom;R7

@@ -1,0 +1,28 @@
+*Pick And Place List
+*Company=
+*Author=
+*eMail=
+*
+*Project=Quant_Mo
+*Date=22:09:15
+*CreatedBy=Fritzing 0.9.3b.04.19.5c895d327c44a3114e5fcc9d8260daf0cbb52806
+*
+*
+*Coordinates in mm, always center of component
+*Origin 0/0=Lower left corner of PCB
+*Rotation in degree (0-360, math. pos.)
+*
+*No;Value;Package;X;Y;Rotation;Side;Name
+1;;5 mm [THT];45.954;-49.645;-90;Bottom;LED2
+2;;;7.0342;-2.41687;0;Bottom;Via3
+3;220;THT;44.1051;-39.485;0;Bottom;R3
+4;;5 mm [THT];53.574;-49.645;-90;Bottom;LED3
+5;;TO92 [THT];26.414;-46.9145;-90;Bottom;Q1
+6;;;24.103;-4.85527;0;Bottom;Via4
+7;220;THT;44.1051;-42.025;0;Bottom;R2
+8;;;19.039;-9.61987;-90;Bottom;NRF24
+9;;;37.6644;-21.5354;0;Bottom;MCU1
+10;;;35.0758;-1.80727;0;Bottom;Via2
+11;;5 mm [THT];38.334;-49.645;-90;Bottom;LED1
+12;220;THT;44.1051;-44.565;0;Bottom;R1
+13;;;13.6251;-17.895;-90;Bottom;Thermal Camera
