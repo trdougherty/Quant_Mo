@@ -115,3 +115,4 @@ SANDBOX/
 *.p
 *.zip
 name
+physical_components/
