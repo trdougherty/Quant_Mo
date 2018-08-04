@@ -10,6 +10,7 @@ motion=_motion.avi
 
 GEN_NAME=$(cat name)
 time_s=$(date +%Y-%m-%d.%H:%M:%S)
+DOW=$(date +%u)
 
 if [[ -n $1 ]];then
     name=$1
@@ -23,7 +24,7 @@ else
 fi
 
 python record.py -t 10 -o $storage$name$avi
-python video_application.py -i $storage$name$avi -o $storage$name$motion -r $storage$name'@'$time_s
+python video_application.py -i $storage$name$avi -o $storage$name$motion -r $storage$name'!'$DOW'@'$time_s
 rm $storage$name$avi
 
 #python video_compression.py -i $storage$name$motion -o $storage$name$compile
