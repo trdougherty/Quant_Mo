@@ -12,6 +12,7 @@ from mpl_toolkits import mplot3d
 from memory_profiler import profile
 from uncertainties import unumpy
 import uncertainties as u
+import ucert
 
 #Variables of interest
 axis = 0
@@ -21,8 +22,8 @@ ap = argparse.ArgumentParser()
 ap.add_argument("-o", "--output", required=False,
 	help="path to output video file"),
 ap.add_argument("-diff", "--difference", required=False, dest='difference', action='store_true',
-    help="yields discrepancy between arrays")
- ap.add_argument("-p", "--print", required=False, dest='p', action='store_true',
+    help="yields discrepancy between arrays"),
+ap.add_argument("-p", "--print", required=False, dest='p', action='store_true',
      help="prints sample output")
 ap.set_defaults(difference=False)
 args = vars(ap.parse_args())
@@ -34,14 +35,6 @@ def process(file):
     recompose[:,:,0] = ar1
     recompose[:,:,1] = ar2
     return [date, iteration, recompose]
-
-def f_process(file):
-    numObj = np.load(file)
-    [date, ar1, ar2] = numObj
-    recompose = np.zeros([ar1.shape[0],ar1.shape[1],2])
-    recompose[:,:,0] = ar1
-    recompose[:,:,1] = ar2
-    return [date, recompose]
 
 # Not really needed for this
 def localize(point, x, y, mv = 0.08):
@@ -88,19 +81,15 @@ def printArr(arr, axis):
 def normalize(x):
     return x/np.amax(np.absolute(x))
 
-@profile
-def uncert(arr):
-    assert type(arr).__module__ == np.__name__ # This confirms we're working with a numpy array
-    assert len(arr.shape) >= 3 # This confirms we're working with at least a 4D array
-    a = unumpy.uarray(np.sum(arr,axis=0)/arr.shape[0],np.std(arr,axis=0))
-    return a
-
-
 def saveArr(x):
     assert x.shape[2] == 2 #Test to verify we're passing in the correct motion vectors
     t = datetime.datetime.now().timestamp()
     arrayStorage = np.array([t,x], dtype = object)
     np.save(args["output"], arrayStorage)
+
+def intensity(x):
+    assert type(x).__module__ == np.__name__
+    return np.power(np.sum(np.power(x,2),axis=len(x.shape)-1),0.5) # pythagorean
 
 
 if __name__ == '__main__':
@@ -124,10 +113,11 @@ if __name__ == '__main__':
             tempArr.append(arr)
 
         totArr = np.array(tempArr, dtype='uint8')
-        u_array = uncert(totArr)
+        u_array = np.average(totArr,axis=0)
+        print(u_array.shape)
 
     # Allows us to work with the shape off the photo we're looking at
-    printArr(unumpy.std_devs(u_array), axis)
+    # printArr(unumpy.std_devs(u_array), axis)
 
     # Finally saves the array
-    saveArr(motionArr)
+    saveArr(u_array)
