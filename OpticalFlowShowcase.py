@@ -42,7 +42,7 @@ class DenseOpticalFlow(IOpticalFlow):
 
         result = self.makeResult(next, self.flow)
         self.prev = next
-        return self.flow
+        return result
 
     def getFlow(self):
         return self.flow

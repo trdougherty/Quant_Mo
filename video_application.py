@@ -10,7 +10,6 @@ from __future__ import print_function
 
 import time
 import cv2
-from OpticalFlowShowcase import *
 import numpy as np
 #from imutils.video import VideoStream
 #import imutils
@@ -18,6 +17,7 @@ import argparse
 from datetime import datetime
 from uncertainties import unumpy
 import ucert
+import flow
 
 usage_text = '''
 Flags:
@@ -63,15 +63,14 @@ def main():
             ret, frame = cap.read()
             if(initialized == False):
             #Builds the appropriate optical flow
-                of = CreateOpticalFlow('dense_hsv') #dense_hsv')
-                of.set1stFrame(frame)
+                of = flow.Flow(frame) #dense_hsv')
                 initialized = True
                 ret, frame = cap.read() #Sets the frames again to appropriately build the first set
                 iterations = 0
                 flowSum = []
 
             if ret == True:
-                flowSum.append(of.apply(frame))
+                flowSum.append(of.calc(frame))
             else:
                 break
         except KeyboardInterrupt:

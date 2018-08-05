@@ -29,12 +29,9 @@ ap.set_defaults(difference=False)
 args = vars(ap.parse_args())
 
 def process(file):
-    numObj = np.load(file, encoding = 'latin1')
-    [date, iteration, ar1, ar2] = numObj
-    recompose = np.zeros([ar1.shape[0],ar1.shape[1],2])
-    recompose[:,:,0] = ar1
-    recompose[:,:,1] = ar2
-    return [date, iteration, recompose]
+    numObj = np.load(file)
+    [date, arr] = numObj
+    return [date, arr]
 
 # Not really needed for this
 def localize(point, x, y, mv = 0.08):
@@ -103,12 +100,12 @@ if __name__ == '__main__':
 
     if diff:
         assert len(files) >= 2
-        [a_date, a_arr] = f_process(files[0])
-        [b_date, b_arr] = f_process(files[1])
-        motionArr = b_arr - a_arr
+        [a_date, a_arr] = np.load(files[0])
+        [b_date, b_arr] = np.load(files[1])
+        u_array = b_arr - a_arr
     else:
         for i in files:
-            [temp_date, ite, arr] = process(i)
+            [temp_date, arr] = process(i)
             dates.append(temp_date)
             tempArr.append(arr)
 
