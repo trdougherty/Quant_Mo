@@ -9,6 +9,9 @@ import sys
 import datetime
 from matplotlib import pyplot as plt
 from mpl_toolkits import mplot3d
+from memory_profiler import profile
+from uncertainties import unumpy
+import uncertainties as u
 
 #Variables of interest
 axis = 0
@@ -19,6 +22,8 @@ ap.add_argument("-o", "--output", required=False,
 	help="path to output video file"),
 ap.add_argument("-diff", "--difference", required=False, dest='difference', action='store_true',
     help="yields discrepancy between arrays")
+ ap.add_argument("-p", "--print", required=False, dest='p', action='store_true',
+     help="prints sample output")
 ap.set_defaults(difference=False)
 args = vars(ap.parse_args())
 
@@ -79,21 +84,31 @@ def printArr(arr, axis):
 
 
 # Shouldn't really be needed
+
 def normalize(x):
     return x/np.amax(np.absolute(x))
+
+@profile
+def uncert(arr):
+    assert type(arr).__module__ == np.__name__ # This confirms we're working with a numpy array
+    assert len(arr.shape) >= 3 # This confirms we're working with at least a 4D array
+    a = unumpy.uarray(np.sum(arr,axis=0)/arr.shape[0],np.std(arr,axis=0))
+    return a
+
 
 def saveArr(x):
     assert x.shape[2] == 2 #Test to verify we're passing in the correct motion vectors
     t = datetime.datetime.now().timestamp()
-    arrayStorage = np.array([t,x[:,:,0],x[:,:,1]], dtype = object)
+    arrayStorage = np.array([t,x], dtype = object)
     np.save(args["output"], arrayStorage)
 
 
 if __name__ == '__main__':
     diff = args["difference"]
     files = fileImport()
-    print("Files are:\t{}".format(files))
+    print("Num of files:\t{}".format(len(files)))
     dates = []
+    tempArr = []
 
     print("Output is:\t{}".format(args["output"]))
 
@@ -103,19 +118,16 @@ if __name__ == '__main__':
         [b_date, b_arr] = f_process(files[1])
         motionArr = b_arr - a_arr
     else:
-        [date, sumIter, totArr] = process(files[0]) #This gives us our first iterations and sum array
-        dates.append(date)
-        for i in files[1:]:
+        for i in files:
             [temp_date, ite, arr] = process(i)
             dates.append(temp_date)
-            totArr = np.insert(totArr,totArr.shape[0],arr,axis=0)
+            tempArr.append(arr)
 
-        print(totArr.shape)
-        # motionArr = sumArray / sumIter #KEY LINE
-        # motionArr = normalize(motionArr)
+        totArr = np.array(tempArr, dtype='uint8')
+        u_array = uncert(totArr)
 
     # Allows us to work with the shape off the photo we're looking at
-    # printArr(motionArr, axis)
+    printArr(unumpy.std_devs(u_array), axis)
 
     # Finally saves the array
-    # saveArr(motionArr)
+    saveArr(motionArr)
