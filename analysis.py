@@ -103,21 +103,19 @@ if __name__ == '__main__':
         [b_date, b_arr] = f_process(files[1])
         motionArr = b_arr - a_arr
     else:
-        [date, sumIter, sumArray] = process(files[0]) #This gives us our first iterations and sum array
+        [date, sumIter, totArr] = process(files[0]) #This gives us our first iterations and sum array
         dates.append(date)
         for i in files[1:]:
             [temp_date, ite, arr] = process(i)
             dates.append(temp_date)
-            print("Sum of iterations is:\t{}".format(sumIter))
-            sumIter += ite
-            sumArray += arr
+            totArr = np.insert(totArr,totArr.shape[0],arr,axis=0)
 
-        print("Final number of iterations is:\t{}".format(sumIter))
-        motionArr = sumArray / sumIter #KEY LINE
+        print(totArr.shape)
+        # motionArr = sumArray / sumIter #KEY LINE
         # motionArr = normalize(motionArr)
 
     # Allows us to work with the shape off the photo we're looking at
-    printArr(motionArr, axis)
+    # printArr(motionArr, axis)
 
     # Finally saves the array
-    saveArr(motionArr)
+    # saveArr(motionArr)

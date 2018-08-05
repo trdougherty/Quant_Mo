@@ -1,0 +1,16 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+opencv-python = "==3.4.2.17"
+numpy = "*"
+uncertainties = "*"
+
+[dev-packages]
+matplotlib = "*"
+memory-profiler = "*"
+
+[requires]
+python_version = "3.7"

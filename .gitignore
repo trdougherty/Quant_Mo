@@ -109,7 +109,6 @@ data/
 .DS_Store
 *.jpg
 *.avi
-SANDBOX/
 *.npy
 *.h5
 *.p
