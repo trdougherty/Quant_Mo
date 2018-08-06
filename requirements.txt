@@ -1,0 +1,4 @@
+-i https://pypi.org/simple
+numpy==1.15.0
+opencv-python==3.4.2.17
+uncertainties==3.0.2
