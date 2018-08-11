@@ -23,9 +23,10 @@ ap.add_argument("-o", "--output", required=False,
 	help="path to output video file"),
 ap.add_argument("-diff", "--difference", required=False, dest='difference', action='store_true',
     help="yields discrepancy between arrays"),
-ap.add_argument("-p", "--print", required=False, dest='p', action='store_true',
+ap.add_argument("-e", "--echo", required=False, dest='echo', action='store_true',
      help="prints sample output")
 ap.set_defaults(difference=False)
+ap.set_defaults(echo=False)
 args = vars(ap.parse_args())
 
 def process(file):
@@ -109,12 +110,14 @@ if __name__ == '__main__':
             dates.append(temp_date)
             tempArr.append(arr)
 
-        totArr = np.array(tempArr, dtype='uint8')
+        totArr = np.asarray(tempArr)
         u_array = np.average(totArr,axis=0)
         print(u_array.shape)
 
     # Allows us to work with the shape off the photo we're looking at
-    # printArr(unumpy.std_devs(u_array), axis)
+    echo = args["echo"]
+    if echo:
+        printArr(unumpy.std_devs(u_array), axis)
 
     # Finally saves the array
     saveArr(u_array)
