@@ -86,7 +86,7 @@ def main():
     except:
         print('Major error. Check debugger')
 
-    arrayStorage = np.array([t,X, dtype = object])
+    arrayStorage = np.array([t,X], dtype=object)
     np.save(args["raw_file"], arrayStorage)
 
 
