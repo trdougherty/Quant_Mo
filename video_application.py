@@ -81,7 +81,7 @@ def main():
     cv2.destroyAllWindows()
 
     t = str(datetime.now())
-    X = ucert.uncert(flowSum)
+    X = ucert.uncert(np.array(flowSum))
 
     arrayStorage = np.array([t,X], dtype=object)
     np.save(args["raw_file"], arrayStorage)
