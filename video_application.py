@@ -80,11 +80,8 @@ def main():
     #if args["polar"]: writer.release()
     cv2.destroyAllWindows()
 
-    try:
-        t = str(datetime.now())
-        X = ucert.uncert(flowSum)
-    except:
-        print('Major error. Check debugger')
+    t = str(datetime.now())
+    X = ucert.uncert(flowSum)
 
     arrayStorage = np.array([t,X], dtype=object)
     np.save(args["raw_file"], arrayStorage)
