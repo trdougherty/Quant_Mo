@@ -1,5 +1,6 @@
 from uncertainties import unumpy
 import uncertainties as u
+import numpy as np
 
 def uncert(arr):
     assert type(arr).__module__ == np.__name__ # This confirms we're working with a numpy array
