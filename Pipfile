@@ -7,6 +7,8 @@ name = "pypi"
 opencv-python = "==3.4.2.17"
 numpy = "*"
 uncertainties = "*"
+cython = "*"
+scikit-image = "*"
 
 [dev-packages]
 matplotlib = "*"
