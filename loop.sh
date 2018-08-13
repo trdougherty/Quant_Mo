@@ -7,7 +7,6 @@ while :
 do
     current=$(date +%H)
     if [ $current -gt $START ] && [ $current -lt $END ]; then
-    do
     bash whole_process.sh $1
     sleep 10
     fi
