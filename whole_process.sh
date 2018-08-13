@@ -23,7 +23,7 @@ else
     exit 1
 fi
 
-python record.py -t 10 -o $storage$name$avi
+python record.py -t 30 -o $storage$name$avi
 python video_application.py -i $storage$name$avi -o $storage$name$motion -r $storage$name'!'$DOW'@'$time_s
 rm $storage$name$avi
 
