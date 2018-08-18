@@ -13,6 +13,16 @@ from memory_profiler import profile
 from uncertainties import unumpy
 import uncertainties as u
 import ucert
+import resource
+
+# print(resource.getrlimit(resource.RLIMIT_STACK))
+# print(sys.getrecursionlimit())
+
+# max_rec = 0x100000
+
+# # May segfault without this line. 0x100 is a guess at the size of each stack frame.
+# resource.setrlimit(resource.RLIMIT_STACK, [0x100 * max_rec, resource.RLIM_INFINITY])
+# sys.setrecursionlimit(max_rec)
 
 #Variables of interest
 axis = 0
@@ -86,8 +96,16 @@ def saveArr(x):
     np.save(args["output"], arrayStorage)
 
 def intensity(x):
+    # This is taking the hypotenuse of the intensity vectors
     assert type(x).__module__ == np.__name__
     return np.power(np.sum(np.power(x,2),axis=len(x.shape)-1),0.5) # pythagorean
+
+def reshapeHelp(arr):
+    ### This function converts the array into an added dimension to support concatenation later
+    assert type(arr).__module__ == np.__name__
+    lis = list(arr.shape)
+    lis.insert(0,1)
+    return np.asarray(np.reshape(arr,tuple(lis)), dtype='uint8')
 
 
 if __name__ == '__main__':
@@ -95,7 +113,7 @@ if __name__ == '__main__':
     files = fileImport()
     print("Num of files:\t{}".format(len(files)))
     dates = []
-    tempArr = []
+    tempArr = np.array([],dtype=int)
 
     print("Output is:\t{}".format(args["output"]))
 
@@ -108,10 +126,14 @@ if __name__ == '__main__':
         for i in files:
             [temp_date, arr] = process(i)
             dates.append(temp_date)
-            tempArr.append(arr)
+            if sys.getsizeof(tempArr) == 96:
+                tempArr = reshapeHelp(arr)
+            else:
+                tempArr = np.concatenate(tempArr,reshapeHelp(arr),axis=0)
+            
+            print('Shape of the array is: {}'.format(tempArr.shape))
 
-        totArr = np.asarray(tempArr)
-        u_array = np.average(totArr,axis=0)
+        u_array = np.average(tempArr,axis=0)
         print(u_array.shape)
 
     # Allows us to work with the shape off the photo we're looking at
