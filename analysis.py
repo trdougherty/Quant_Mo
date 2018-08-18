@@ -13,7 +13,7 @@ from memory_profiler import profile
 from uncertainties import unumpy
 import uncertainties as u
 import ucert
-import resource
+import gc
 
 # print(resource.getrlimit(resource.RLIMIT_STACK))
 # print(sys.getrecursionlimit())
@@ -25,16 +25,19 @@ import resource
 # sys.setrecursionlimit(max_rec)
 
 #Variables of interest
-axis = 0
+axis = 1
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-o", "--output", required=False,
 	help="path to output video file"),
+ap.add_argument("-s", "--save", required=False, dest='save', action='store_true',
+    help="stores the array if provided"),
 ap.add_argument("-diff", "--difference", required=False, dest='difference', action='store_true',
     help="yields discrepancy between arrays"),
 ap.add_argument("-e", "--echo", required=False, dest='echo', action='store_true',
      help="prints sample output")
+ap.set_defaults(save=False)
 ap.set_defaults(difference=False)
 ap.set_defaults(echo=False)
 args = vars(ap.parse_args())
@@ -55,6 +58,14 @@ def gradient(array): return np.gradient(array) #np.add.reduce(np.gradient(array)
 
 def humanDate(ts):
     return datetime.datetime.fromtimestamp(ts)
+
+def sizeof_fmt(num, suffix='B'):
+    ## Took this from online to read how much RAM this is using
+    for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
+        if abs(num) < 1024.0:
+            return "%3.1f%s%s" % (num, unit, suffix)
+        num /= 1024.0
+    return "%.1f%s%s" % (num, 'Yi', suffix)
 
 def fileImport():
     imported = sys.stdin.read()
@@ -92,7 +103,8 @@ def normalize(x):
 def saveArr(x):
     assert x.shape[2] == 2 #Test to verify we're passing in the correct motion vectors
     t = datetime.datetime.now().timestamp()
-    arrayStorage = np.array([t,x], dtype = object)
+    arrayStorage = np.array([t,x.copy()], dtype = object)
+    print('Saving an array of size: {}'.format(sizeof_fmt(sys.getsizeof(arrayStorage))))
     np.save(args["output"], arrayStorage)
 
 def intensity(x):
@@ -105,7 +117,7 @@ def reshapeHelp(arr):
     assert type(arr).__module__ == np.__name__
     lis = list(arr.shape)
     lis.insert(0,1)
-    return np.asarray(np.reshape(arr,tuple(lis)), dtype='uint8')
+    return np.reshape(arr,tuple(lis))
 
 
 if __name__ == '__main__':
@@ -129,17 +141,28 @@ if __name__ == '__main__':
             if sys.getsizeof(tempArr) == 96:
                 tempArr = reshapeHelp(arr)
             else:
-                tempArr = np.concatenate(tempArr,reshapeHelp(arr),axis=0)
+                tempIn = reshapeHelp(arr)
+                tempArr = np.concatenate((tempArr,tempIn),axis=0)
             
             print('Shape of the array is: {}'.format(tempArr.shape))
+            print('Size of the array is: {}\n'.format(sizeof_fmt(sys.getsizeof(tempArr))))
 
-        u_array = np.average(tempArr,axis=0)
+        u_array = np.mean(tempArr,axis=0)
+
+        # Try and mitigate the memory consumption
+        u_array = u_array.copy()
+        del tempArr
+        gc.collect()
+
+        print('Size of the final average: {}\n'.format(sizeof_fmt(sys.getsizeof(u_array))))
         print(u_array.shape)
 
     # Allows us to work with the shape off the photo we're looking at
     echo = args["echo"]
     if echo:
-        printArr(unumpy.std_devs(u_array), axis)
+        printArr(normalize(unumpy.std_devs(u_array)), axis)
 
     # Finally saves the array
-    saveArr(u_array)
+    save = args["save"]
+    if save:
+        saveArr(u_array)
