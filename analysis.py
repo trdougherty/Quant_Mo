@@ -25,7 +25,8 @@ import gc
 # sys.setrecursionlimit(max_rec)
 
 #Variables of interest
-axis = 1
+## NOTE - 0 is X and 1 is Y
+axis = 0
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
@@ -160,7 +161,8 @@ if __name__ == '__main__':
     # Allows us to work with the shape off the photo we're looking at
     echo = args["echo"]
     if echo:
-        printArr(normalize(unumpy.std_devs(u_array)), axis)
+        printArr(normalize(unumpy.std_devs(u_array)), 0)
+        printArr(normalize(unumpy.std_devs(u_array)), 1)
 
     # Finally saves the array
     save = args["save"]
