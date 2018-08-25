@@ -30,12 +30,10 @@ axis = 0
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
-ap.add_argument("-i", "--input", required=False,
+ap.add_argument("-o", "--output", required=False,
                 help="path to output video file"),
 ap.add_argument("-diff", "--difference", required=False, dest='difference', action='store_true',
                 help="yields discrepancy between arrays"),
-ap.add_argument("-e", "--echo", required=False, dest='echo', action='store_true',
-                help="prints sample output")
 ap.set_defaults(save=False)
 ap.set_defaults(difference=False)
 ap.set_defaults(echo=False)
@@ -118,7 +116,7 @@ def reshapeHelp(arr):
     assert type(arr).__module__ == np.__name__
     lis = list(arr.shape)
     lis.insert(0, 1)
-    return np.reshape(arr, tuple(lis))
+    return np.ndarray(np.reshape(arr, tuple(lis)), dtype='float32')
 
 
 if __name__ == '__main__':
@@ -156,17 +154,7 @@ if __name__ == '__main__':
         del tempArr
         gc.collect()
 
-        print('Size of the final average: {}\n'.format(
-            sizeof_fmt(sys.getsizeof(u_array))))
+        print('Size of the final average: {}\n'.format(sizeof_fmt(sys.getsizeof(u_array))))
         print(u_array.shape)
 
-    # Allows us to work with the shape off the photo we're looking at
-    echo = args["echo"]
-    if echo:
-        printArr(normalize(unumpy.std_devs(u_array)), 0)
-        printArr(normalize(unumpy.std_devs(u_array)), 1)
-
-    # Finally saves the array
-    save = args["save"]
-    if save:
         saveArr(u_array)
