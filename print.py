@@ -13,7 +13,9 @@ from memory_profiler import profile
 from uncertainties import unumpy
 import uncertainties as u
 import ucert
-import gc
+import plotly.plotly as py
+import plotly
+import plotly.graph_objs as go
 
 # print(resource.getrlimit(resource.RLIMIT_STACK))
 # print(sys.getrecursionlimit())
@@ -63,22 +65,116 @@ def printArr(arr, axis):
     x_dist = np.arange(0,arr.shape[0])
     y_dist = np.arange(0,arr.shape[1])
 
-    xx, yy = np.meshgrid(x_dist, y_dist)
-    Z = arr[:,:,axis]
+    x, y = np.meshgrid(x_dist, y_dist)
+    z = arr[:,:,axis]
 
-    min_ = -1; max_ = 1 # This is the default value
-    if (Z.min() < -1): min_ = Z.min()
-    if (Z.max() > 1): max_ = Z.max()
+    # min_ = -1; max_ = 1 # This is the default value
+    # if (Z.min() < -1): min_ = Z.min()
+    # if (Z.max() > 1): max_ = Z.max()
 
-    fig = plt.figure()
-    ax = plt.axes(projection='3d')
-    ax.contour3D(xx, yy, Z, arr.shape[0], cmap='binary')
-    ax.set_title('{} Axis'.format(axis))
-    ax.set_xlabel('x')
-    ax.set_ylabel('y')
-    ax.set_zlabel('z')
-    ax.set_zlim(min_,max_)
-    plt.show()
+    # fig = plt.figure()
+    # ax = plt.axes(projection='3d')
+    # ax.contour3D(xx, yy, Z, arr.shape[0], cmap='binary')
+    # ax.set_title('{} Axis'.format(axis))
+    # ax.set_xlabel('x')
+    # ax.set_ylabel('y')
+    # ax.set_zlabel('z')
+    # ax.set_zlim(min_,max_)
+    # plt.show()
+    colorscale=[[0.0, 'rgb(20,29,67)'],
+        [0.1, 'rgb(28,76,96)'],
+        [0.2, 'rgb(16,125,121)'],
+        [0.3, 'rgb(92,166,133)'],
+        [0.4, 'rgb(182,202,175)'],
+        [0.5, 'rgb(253,245,243)'],
+        [0.6, 'rgb(230,183,162)'],
+        [0.7, 'rgb(211,118,105)'],
+        [0.8, 'rgb(174,63,95)'],
+        [0.9, 'rgb(116,25,93)'],
+        [1.0, 'rgb(51,13,53)']]
+
+    textz=[['x: '+'{:0.5f}'.format(x[i][j])+'<br>y: '+'{:0.5f}'.format(y[i][j])+
+        '<br>z: '+'{:0.5f}'.format(z[i][j]) for j in range(z.shape[1])] for i in range(z.shape[0])]
+
+    trace1= go.Surface(z=z,
+                x=x,
+                y=y,
+                colorscale=colorscale,
+                text=textz,
+                hoverinfo='text',
+                )
+    
+    axis = dict(
+    showbackground=True,
+    backgroundcolor="rgb(230, 230,230)",
+    showgrid=False,
+    zeroline=False,
+    showline=False)
+
+    ztickvals=list(range(64))
+    layout = go.Layout(title="Projections of a surface onto coordinate planes" ,
+                    autosize=False,
+                    width=700,
+                    height=600,
+                    scene=dict(xaxis=dict(axis, range=[0, 64]),
+                                yaxis=dict(axis, range=[0, 64]),
+                                zaxis=dict(axis , tickvals=ztickvals),
+                                aspectratio=dict(x=1,
+                                                y=1,
+                                                z=0.95)
+                            )
+                    )
+    
+    z_offset=(np.min(z)-2)*np.ones(z.shape)#
+    x_offset=np.min(x_dist)*np.ones(z.shape)
+    y_offset=np.min(y_dist)*np.ones(z.shape)
+
+    proj_z=lambda x, y, z: z#projection in the z-direction
+    colorsurfz=proj_z(x,y,z)
+    proj_x=lambda x, y, z: x
+    colorsurfx=proj_z(x,y,z)
+    proj_y=lambda x, y, z: y
+    colorsurfy=proj_z(x,y,z)
+
+    textx=[['y: '+'{:0.5f}'.format(y[i][j])+'<br>z: '+'{:0.5f}'.format(z[i][j])+
+            '<br>x: '+'{:0.5f}'.format(x[i][j]) for j in range(z.shape[1])]  for i in range(z.shape[0])]
+    texty=[['x: '+'{:0.5f}'.format(x[i][j])+'<br>z: '+'{:0.5f}'.format(z[i][j]) +
+            '<br>y: '+'{:0.5f}'.format(y[i][j]) for j in range(z.shape[1])] for i in range(z.shape[0])]
+
+    tracex = go.Surface(z=z,
+                    x=x_offset,
+                    y=y,
+                    colorscale=colorscale,
+                    showlegend=False,
+                    showscale=False,
+                    surfacecolor=colorsurfx,
+                    text=textx,
+                    hoverinfo='text'
+                )
+    tracey = go.Surface(z=z,
+                    x=x,
+                    y=y_offset,
+                    colorscale=colorscale,
+                    showlegend=False,
+                    showscale=False,
+                    surfacecolor=colorsurfy,
+                    text=texty,
+                    hoverinfo='text'
+                )
+    tracez = go.Surface(z=z_offset,
+                    x=x,
+                    y=y,
+                    colorscale=colorscale,
+                    showlegend=False,
+                    showscale=False,
+                    surfacecolor=colorsurfx,
+                    text=textz,
+                    hoverinfo='text'
+                )
+
+    data=[trace1, tracex, tracey, tracez]
+    fig = go.Figure(data=data, layout=layout)
+    plotly.offline.plot(fig)
     return
 
 
@@ -110,4 +206,4 @@ def reshapeHelp(arr):
 if __name__ == '__main__':
     file = args["input"]
     A = importMatrix(file)
-    
+    printArr(A, axis=0)
