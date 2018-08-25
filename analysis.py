@@ -103,6 +103,11 @@ def saveArr(x):
         sizeof_fmt(sys.getsizeof(arrayStorage))))
     np.save(args["output"], arrayStorage)
 
+def saveTxt(u_array):
+    with open(args["output"]+'.txt','w+') as outfile:
+        for i in u_array:
+            np.savetxt(outfile, i, fmt='%r')
+
 
 def intensity(x):
     # This is taking the hypotenuse of the intensity vectors
@@ -116,7 +121,7 @@ def reshapeHelp(arr):
     assert type(arr).__module__ == np.__name__
     lis = list(arr.shape)
     lis.insert(0, 1)
-    return np.ndarray(np.reshape(arr, tuple(lis)), dtype='float32')
+    return np.reshape(arr, tuple(lis))
 
 
 if __name__ == '__main__':
@@ -149,12 +154,7 @@ if __name__ == '__main__':
 
         u_array = np.mean(tempArr, axis=0)
 
-        # Try and mitigate the memory consumption
-        u_array = u_array.copy()
-        del tempArr
-        gc.collect()
+    print('Size of the final average: {}\n'.format(sizeof_fmt(sys.getsizeof(u_array))))
+    print(u_array.shape)
 
-        print('Size of the final average: {}\n'.format(sizeof_fmt(sys.getsizeof(u_array))))
-        print(u_array.shape)
-
-        saveArr(u_array)
+    saveTxt(u_array)

@@ -30,17 +30,9 @@ axis = 0
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
-ap.add_argument("-o", "--output", required=False,
-	help="path to output video file"),
-ap.add_argument("-s", "--save", required=False, dest='save', action='store_true',
-    help="stores the array if provided"),
-ap.add_argument("-diff", "--difference", required=False, dest='difference', action='store_true',
-    help="yields discrepancy between arrays"),
-ap.add_argument("-e", "--echo", required=False, dest='echo', action='store_true',
-     help="prints sample output")
-ap.set_defaults(save=False)
-ap.set_defaults(difference=False)
-ap.set_defaults(echo=False)
+ap.add_argument("-i", "--input", required=True,
+	help="path to input video file"),
+ap.set_defaults(input=False)
 args = vars(ap.parse_args())
 
 def process(file):
@@ -57,20 +49,14 @@ def localize(point, x, y, mv = 0.08):
 # This will give use the divergence of the array which we can use for localizing later
 def gradient(array): return np.gradient(array) #np.add.reduce(np.gradient(array))
 
-def humanDate(ts):
-    return datetime.datetime.fromtimestamp(ts)
-
-def sizeof_fmt(num, suffix='B'):
-    ## Took this from online to read how much RAM this is using
-    for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
-        if abs(num) < 1024.0:
-            return "%3.1f%s%s" % (num, unit, suffix)
-        num /= 1024.0
-    return "%.1f%s%s" % (num, 'Yi', suffix)
-
-def fileImport():
-    imported = sys.stdin.read()
-    return imported.rstrip().split('\n')
+def importMatrix(file):
+    num_cols = 2
+    converters = dict.fromkeys(
+        range(num_cols),
+        lambda col_bytes: u.ufloat_fromstr(col_bytes.decode("latin1")))
+    arr = np.loadtxt(args["input"], converters=converters, dtype=object)
+    return arr.reshape((64,64,2))
+    
 
 def printArr(arr, axis):
     # Allows us to work with the shape off the photo we're looking at
@@ -122,49 +108,6 @@ def reshapeHelp(arr):
 
 
 if __name__ == '__main__':
-    diff = args["difference"]
-    files = fileImport()
-    print("Num of files:\t{}".format(len(files)))
-    dates = []
-    tempArr = np.array([],dtype=int)
-
-    print("Output is:\t{}".format(args["output"]))
-
-    if diff:
-        assert len(files) >= 2
-        [a_date, a_arr] = np.load(files[0])
-        [b_date, b_arr] = np.load(files[1])
-        u_array = b_arr - a_arr
-    else:
-        for i in files:
-            [temp_date, arr] = process(i)
-            dates.append(temp_date)
-            if sys.getsizeof(tempArr) == 96:
-                tempArr = reshapeHelp(arr)
-            else:
-                tempIn = reshapeHelp(arr)
-                tempArr = np.concatenate((tempArr,tempIn),axis=0)
-
-            print('Shape of the array is: {}'.format(tempArr.shape))
-            print('Size of the array is: {}\n'.format(sizeof_fmt(sys.getsizeof(tempArr))))
-
-        u_array = np.mean(tempArr,axis=0)
-
-        # Try and mitigate the memory consumption
-        u_array = u_array.copy()
-        del tempArr
-        gc.collect()
-
-        print('Size of the final average: {}\n'.format(sizeof_fmt(sys.getsizeof(u_array))))
-        print(u_array.shape)
-
-    # Allows us to work with the shape off the photo we're looking at
-    echo = args["echo"]
-    if echo:
-        printArr(normalize(unumpy.std_devs(u_array)), 0)
-        printArr(normalize(unumpy.std_devs(u_array)), 1)
-
-    # Finally saves the array
-    save = args["save"]
-    if save:
-        saveArr(u_array)
+    file = args["input"]
+    A = importMatrix(file)
+    
