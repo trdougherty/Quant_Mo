@@ -1,19 +1,11 @@
 from __future__ import print_function
 import time
-import cv2
-from OpticalFlowShowcase import *
 import numpy as np
 import argparse
 import io
 import sys
 import datetime
-from matplotlib import pyplot as plt
-from mpl_toolkits import mplot3d
-from memory_profiler import profile
-from uncertainties import unumpy
-import uncertainties as u
 import ucert
-import gc
 import os
 
 # print(resource.getrlimit(resource.RLIMIT_STACK))
@@ -43,9 +35,12 @@ ap.set_defaults(difference=False)
 args = vars(ap.parse_args())
 
 def process(file):
-    numObj = np.load(file)
-    [date, arr] = numObj
-    return [date, arr]
+    try:
+        numObj = np.load(file)
+        [date, arr] = numObj
+        return [date, arr]
+    except EOFError:
+        return []
 
 def sizeof_fmt(num, suffix='B'):
     # Took this from online to read how much RAM this is using
@@ -58,7 +53,6 @@ def sizeof_fmt(num, suffix='B'):
 def absoluteFilePaths(directory):
     filenames = os.listdir(directory)
     return [directory+i for i in filenames if '.npy' in i ]
-
 
 def saveArr(x):
     # Test to verify we're passing in the correct motion vectors
@@ -101,17 +95,19 @@ if __name__ == '__main__':
         u_array = b_arr - a_arr
     else:
         for i in files:
-            [temp_date, arr] = process(i)
-            dates.append(temp_date)
-            if sys.getsizeof(tempArr) == 96:
-                tempArr = reshapeHelp(arr)
-            else:
-                tempIn = reshapeHelp(arr)
-                tempArr = np.concatenate((tempArr, tempIn), axis=0)
+            temp = process(i)
+            if temp:
+                [temp_date, arr] = temp
+                dates.append(temp_date)
+                if sys.getsizeof(tempArr) == 96:
+                    tempArr = reshapeHelp(arr)
+                else:
+                    tempIn = reshapeHelp(arr)
+                    tempArr = np.concatenate((tempArr, tempIn), axis=0)
 
-            print('Shape of the array is: {}'.format(tempArr.shape))
-            print('Size of the array is: {}\n'.format(
-                sizeof_fmt(sys.getsizeof(tempArr))))
+                print('Shape of the array is: {}'.format(tempArr.shape))
+                print('Size of the array is: {}\n'.format(
+                    sizeof_fmt(sys.getsizeof(tempArr))))
 
         u_array = np.mean(tempArr, axis=0)
 
