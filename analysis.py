@@ -14,6 +14,7 @@ from uncertainties import unumpy
 import uncertainties as u
 import ucert
 import gc
+import os
 
 # print(resource.getrlimit(resource.RLIMIT_STACK))
 # print(sys.getrecursionlimit())
@@ -30,21 +31,21 @@ axis = 0
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
-ap.add_argument("-o", "--output", required=False,
+ap.add_argument("-i", "--input", required=False, dest='input',
+                help="full path to the location of files"),
+ap.add_argument("-o", "--output", required=False, dest='output',
                 help="path to output video file"),
 ap.add_argument("-diff", "--difference", required=False, dest='difference', action='store_true',
                 help="yields discrepancy between arrays"),
-ap.set_defaults(save=False)
+ap.set_defaults(input='.')
+ap.set_defaults(output='.')
 ap.set_defaults(difference=False)
-ap.set_defaults(echo=False)
 args = vars(ap.parse_args())
-
 
 def process(file):
     numObj = np.load(file)
     [date, arr] = numObj
     return [date, arr]
-
 
 def sizeof_fmt(num, suffix='B'):
     # Took this from online to read how much RAM this is using
@@ -54,44 +55,9 @@ def sizeof_fmt(num, suffix='B'):
         num /= 1024.0
     return "%.1f%s%s" % (num, 'Yi', suffix)
 
-
-def fileImport():
-    imported = sys.stdin.read()
-    return imported.rstrip().split('\n')
-
-
-def printArr(arr):
-    # Allows us to work with the shape off the photo we're looking at
-    x_dist = np.arange(0, arr.shape[0])
-    y_dist = np.arange(0, arr.shape[1])
-
-    xx, yy = np.meshgrid(x_dist, y_dist)
-    for c,i in enumerate(range(arr[-1])):
-        Z[c] = arr[:, :, axis]
-
-    min_ = -1
-    max_ = 1  # This is the default value
-    if (Z.min() < -1):
-        min_ = Z.min()
-    if (Z.max() > 1):
-        max_ = Z.max()
-
-    fig = plt.figure()
-    ax = plt.axes(projection='3d')
-    ax.contour3D(xx, yy, Z, arr.shape[0], cmap='binary')
-    ax.set_title('{} Axis'.format(axis))
-    ax.set_xlabel('x')
-    ax.set_ylabel('y')
-    ax.set_zlabel('z')
-    ax.set_zlim(min_, max_)
-    plt.show()
-    return
-
-
-# Shouldn't really be needed
-
-def normalize(x):
-    return x/np.amax(np.absolute(x))
+def absoluteFilePaths(directory):
+    filenames = os.listdir(directory)
+    return [directory+i for i in filenames if '.npy' in i ]
 
 
 def saveArr(x):
@@ -109,13 +75,6 @@ def saveTxt(u_array):
             np.savetxt(outfile, i, fmt='%r')
 
 
-def intensity(x):
-    # This is taking the hypotenuse of the intensity vectors
-    assert type(x).__module__ == np.__name__
-    # pythagorean
-    return np.power(np.sum(np.power(x, 2), axis=len(x.shape)-1), 0.5)
-
-
 def reshapeHelp(arr):
     # This function converts the array into an added dimension to support concatenation later
     assert type(arr).__module__ == np.__name__
@@ -126,7 +85,8 @@ def reshapeHelp(arr):
 
 if __name__ == '__main__':
     diff = args["difference"]
-    files = fileImport()
+    files = absoluteFilePaths(args["input"])
+    assert files != None # To validate that we don't have a null array
     print("Num of files:\t{}".format(len(files)))
     dates = []
     tempArr = np.array([], dtype=int)
@@ -134,6 +94,7 @@ if __name__ == '__main__':
     print("Output is:\t{}".format(args["output"]))
 
     if diff:
+        # This will need to be modified in the future
         assert len(files) >= 2
         [a_date, a_arr] = np.load(files[0])
         [b_date, b_arr] = np.load(files[1])
