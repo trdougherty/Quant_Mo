@@ -15,6 +15,7 @@ jupyter = "*"
 [dev-packages]
 matplotlib = "*"
 memory-profiler = "*"
+line-profiler = "*"
 
 [requires]
 python_version = "3.7"
