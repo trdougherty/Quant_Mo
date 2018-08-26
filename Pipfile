@@ -10,6 +10,7 @@ uncertainties = "*"
 cython = "*"
 scikit-image = "*"
 plotly = "*"
+jupyter = "*"
 
 [dev-packages]
 matplotlib = "*"

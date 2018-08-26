@@ -191,4 +191,4 @@ def intensity(x):
 if __name__ == '__main__':
     file = args["input"]
     A = importMatrix(file)
-    A_U = unumpy.uarray(*A)
+    A_U = unumpy.uarray(A)
