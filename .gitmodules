@@ -1,3 +1,0 @@
-[submodule "cv_opt_flow"]
-	path = cv_opt_flow
-	url = git@github.com:daisukelab/cv_opt_flow.git
