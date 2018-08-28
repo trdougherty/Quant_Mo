@@ -15,8 +15,8 @@ jupyter = "*"
 [dev-packages]
 matplotlib = "*"
 memory-profiler = "*"
-line-profiler = "*"
 jupyter = "*"
+pylint = "*"
 
 [requires]
 python_version = "3.5.2"
