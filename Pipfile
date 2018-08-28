@@ -11,6 +11,8 @@ cython = "*"
 scikit-image = "*"
 plotly = "*"
 jupyter = "*"
+line-profiler = "*"
+memory-profiler = "*"
 
 [dev-packages]
 matplotlib = "*"
