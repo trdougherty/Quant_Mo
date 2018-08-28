@@ -40,7 +40,7 @@ def process(file):
         [date, arr] = numObj
         return [date, arr]
     except EOFError:
-        return []
+        return None
 
 def sizeof_fmt(num, suffix='B'):
     # Took this from online to read how much RAM this is using
@@ -83,6 +83,7 @@ if __name__ == '__main__':
     assert files != None # To validate that we don't have a null array
     print("Num of files:\t{}".format(len(files)))
     dates = []
+    iterat = 0
     tempArr = np.array([], dtype=int)
 
     print("Output is:\t{}".format(args["output"]))
@@ -97,19 +98,19 @@ if __name__ == '__main__':
         for i in files:
             temp = process(i)
             if temp:
+                iterat += 1
                 [temp_date, arr] = temp
                 dates.append(temp_date)
                 if sys.getsizeof(tempArr) == 96:
-                    tempArr = reshapeHelp(arr)
+                    tempArr = arr
                 else:
-                    tempIn = reshapeHelp(arr)
-                    tempArr = np.concatenate((tempArr, tempIn), axis=0)
+                    tempArr += arr
 
                 print('Shape of the array is: {}'.format(tempArr.shape))
                 print('Size of the array is: {}\n'.format(
                     sizeof_fmt(sys.getsizeof(tempArr))))
 
-        u_array = np.mean(tempArr, axis=0)
+        u_array = tempArr / iterat
 
     print('Size of the final average: {}\n'.format(sizeof_fmt(sys.getsizeof(u_array))))
     print(u_array.shape)
