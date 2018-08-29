@@ -1,12 +1,14 @@
 from __future__ import print_function
 import time
 import numpy as np
+from uncertainties import unumpy
 import argparse
 import io
 import sys
 import datetime
 import ucert
 import os
+import pdb
 
 # print(resource.getrlimit(resource.RLIMIT_STACK))
 # print(sys.getrecursionlimit())
@@ -84,7 +86,8 @@ if __name__ == '__main__':
     print("Num of files:\t{}".format(len(files)))
     dates = []
     iterat = 0
-    tempArr = np.array([], dtype=int)
+    tempArr_x = np.array([], dtype=int)
+    tempArr_y = np.array([], dtype=int)
 
     print("Output is:\t{}".format(args["output"]))
 
@@ -101,18 +104,22 @@ if __name__ == '__main__':
                 iterat += 1
                 [temp_date, arr] = temp
                 dates.append(temp_date)
-                if sys.getsizeof(tempArr) == 96:
-                    tempArr = arr
+                if sys.getsizeof(tempArr_x) == 96:
+                    tempArr_x = unumpy.matrix(arr[0]).nominal_values
+                    tempArr_y = unumpy.matrix(arr[1]).nominal_values
                 else:
-                    tempArr += arr
+                    tempArr_x += unumpy.matrix(arr[0]).nominal_values
+                    tempArr_y += unumpy.matrix(arr[1]).nominal_values
 
-                print('Shape of the array is: {}'.format(tempArr.shape))
-                print('Size of the array is: {}\n'.format(
-                    sizeof_fmt(sys.getsizeof(tempArr))))
+                print('SIZE: {}\n'.format(
+                    sizeof_fmt(sys.getsizeof(tempArr_x))))
+                print('SHAPE: {}'.format(tempArr_x.shape))
+        
+        u_array = np.concatenate((reshapeHelp(np.array(tempArr_x)),reshapeHelp(np.array(tempArr_y))), axis=0)
+        u_array = tempArr_x / iterat
+        print("\n-----------FINISHED PROCESSING-----------\n")
 
-        u_array = tempArr / iterat
-
-    print('Size of the final average: {}\n'.format(sizeof_fmt(sys.getsizeof(u_array))))
-    print(u_array.shape)
+    print('FINAL SIZE: {}'.format(sizeof_fmt(sys.getsizeof(u_array))))
+    print('FINAL SHAPE: {}'.format(u_array.shape))
 
     saveTxt(u_array)
