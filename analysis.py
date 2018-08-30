@@ -134,4 +134,4 @@ if __name__ == '__main__':
     print('FINAL SHAPE: {}\n'.format(u_array.shape))
 
     np.save(args["output"], u_array)
-    np.save(args["output"]+"_std", u_array)
+    np.save(args["output"]+"_std", u_array_std)

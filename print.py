@@ -37,9 +37,7 @@ ap.set_defaults(input=False)
 args = vars(ap.parse_args())
 
 def process(file):
-    numObj = np.load(file)
-    [date, arr] = numObj
-    return [date, arr]
+    return np.load(file)
 
 # Not really needed for this
 def localize(point, x, y, mv = 0.08):
