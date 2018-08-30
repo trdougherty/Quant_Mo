@@ -38,9 +38,22 @@ args = vars(ap.parse_args())
 
 def process(file):
     try:
+        # Assumes shape of (X,X,i) for this array - otherwise unumpy array would be unable to cope
         numObj = np.load(file)
         [date, arr] = numObj
-        return [date, arr]
+        # newShape = list(arr.shape)
+        # newShape[-1] *= 2; 
+        # outArr = np.zeros(newShape, dtype='float16')
+        A = unumpy.matrix(arr.flatten())
+        # this SHOULD build a new array that's twice as big - 
+        # but everything is float values instead of strings (yay) and alternates 
+        # between nominal, std, nominal, std
+        A_nom = np.ravel(A.nominal_values)
+        outArr = np.reshape(A_nom, arr.shape)
+        # A_std = np.ravel(A.std_devs)
+        # outArr[...,::2] = np.reshape(A_nom, arr.shape)
+        # outArr[...,1::2] = np.reshape(A_std, arr.shape)
+        return [date, outArr]
     except EOFError:
         return None
 
@@ -76,7 +89,7 @@ def reshapeHelp(arr):
     assert type(arr).__module__ == np.__name__
     lis = list(arr.shape)
     lis.insert(0, 1)
-    return np.reshape(arr, tuple(lis))
+    return np.reshape(arr, tuple(lis)).astype('float16')
 
 
 if __name__ == '__main__':
@@ -86,8 +99,7 @@ if __name__ == '__main__':
     print("Num of files:\t{}".format(len(files)))
     dates = []
     iterat = 0
-    tempArr_x = np.array([], dtype=int)
-    tempArr_y = np.array([], dtype=int)
+    tempArr = np.array([], dtype='float16')
 
     print("Output is:\t{}".format(args["output"]))
 
@@ -101,25 +113,25 @@ if __name__ == '__main__':
         for i in files:
             temp = process(i)
             if temp:
-                iterat += 1
                 [temp_date, arr] = temp
                 dates.append(temp_date)
-                if sys.getsizeof(tempArr_x) == 96:
-                    tempArr_x = unumpy.matrix(arr[0]).nominal_values
-                    tempArr_y = unumpy.matrix(arr[1]).nominal_values
+                if sys.getsizeof(tempArr) == 96:
+                    tempArr = reshapeHelp(arr)
                 else:
-                    tempArr_x += unumpy.matrix(arr[0]).nominal_values
-                    tempArr_y += unumpy.matrix(arr[1]).nominal_values
+                    tempArr = np.concatenate([tempArr, reshapeHelp(arr)], axis=0)
 
                 print('SIZE: {}\n'.format(
-                    sizeof_fmt(sys.getsizeof(tempArr_x))))
-                print('SHAPE: {}'.format(tempArr_x.shape))
-        
-        u_array = np.concatenate((reshapeHelp(np.array(tempArr_x)),reshapeHelp(np.array(tempArr_y))), axis=0)
-        u_array = tempArr_x / iterat
+                    sizeof_fmt(sys.getsizeof(tempArr))))
+                print('SHAPE: {}'.format(tempArr.shape))
+
+        u_array = np.mean(tempArr, axis=0)
+        u_array_std = np.std(tempArr, axis=0)
         print("\n-----------FINISHED PROCESSING-----------\n")
 
+    print('FINAL VALUES: {}\n'.format(u_array))
+    print('FINAL ERROR: {}'.format(u_array_std))
     print('FINAL SIZE: {}'.format(sizeof_fmt(sys.getsizeof(u_array))))
-    print('FINAL SHAPE: {}'.format(u_array.shape))
+    print('FINAL SHAPE: {}\n'.format(u_array.shape))
 
-    saveTxt(u_array)
+    np.save(args["output"], u_array)
+    np.save(args["output"]+"_std", u_array)
