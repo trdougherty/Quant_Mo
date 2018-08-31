@@ -45,6 +45,12 @@ def localize(point, x, y, mv = 0.08):
     Z[ Z > mv ] = mv
     return Z*(1/mv)
 
+# Output the center of the array
+def edge(arr):
+    lower_bound = 0.2; upper_bound = 0.8
+    x_ = arr.shape[0]; y_ = arr.shape[1]
+    return arr[int(x_*lower_bound):int(x_*upper_bound),int(y_*lower_bound):int(y_*upper_bound),:]
+
 # This will give use the divergence of the array which we can use for localizing later
 def gradient(array): return np.gradient(array) #np.add.reduce(np.gradient(array))
 
