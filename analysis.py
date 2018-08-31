@@ -69,6 +69,11 @@ def absoluteFilePaths(directory):
     filenames = os.listdir(directory)
     return [directory+i for i in filenames if '.npy' in i ]
 
+def edge(arr):
+    lower_bound = 0.2; upper_bound = 0.8
+    x_ = arr.shape[0]; y_ = arr.shape[1]
+    return arr[int(x_*lower_bound):int(x_*upper_bound),int(y_*lower_bound):int(y_*upper_bound),:]
+
 def saveArr(x):
     # Test to verify we're passing in the correct motion vectors
     assert x.shape[2] == 2
