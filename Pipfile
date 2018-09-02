@@ -13,12 +13,16 @@ plotly = "*"
 jupyter = "*"
 line-profiler = "*"
 memory-profiler = "*"
+dash = "==0.26.3"
 
 [dev-packages]
 matplotlib = "*"
 memory-profiler = "*"
 jupyter = "*"
 pylint = "*"
+dash-renderer = "==0.13.2"
+dash-html-components = "==0.11.0"
+dash-core-components = "==0.28.1"
 
 [requires]
 python_version = "3.5.2"
