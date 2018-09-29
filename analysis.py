@@ -2,6 +2,7 @@ from __future__ import print_function
 import time
 import numpy as np
 from uncertainties import unumpy
+import cv2
 import argparse
 import io
 import sys
@@ -29,11 +30,17 @@ ap.add_argument("-i", "--input", required=False, dest='input',
                 help="full path to the location of files"),
 ap.add_argument("-o", "--output", required=False, dest='output',
                 help="path to output video file"),
-ap.add_argument("-diff", "--difference", required=False, dest='difference', action='store_true',
+ap.add_argument("-d", "--difference", required=False, dest='difference', action='store_true',
                 help="yields discrepancy between arrays"),
+ap.add_argument("-e", "--evolution", required=False, dest='evolution', action='store_true',
+                help="shows the evolution of the motion development"),
+ap.add_argument("-s", "--e_step", required=False, dest='evo_step', action='store_const',
+                help="resolution of the average video"),
 ap.set_defaults(input='.')
 ap.set_defaults(output='.')
 ap.set_defaults(difference=False)
+ap.set_defaults(evolution=True)
+ap.set_defaults(evo_step=3)
 args = vars(ap.parse_args())
 
 def process(file):
@@ -115,7 +122,7 @@ if __name__ == '__main__':
         [b_date, b_arr] = np.load(files[1])
         u_array = b_arr - a_arr
     else:
-        for i in files:
+        for c,i in enumerate(files):
             temp = process(i)
             if temp:
                 [temp_date, arr] = temp
@@ -128,6 +135,7 @@ if __name__ == '__main__':
                 print('SIZE: {}\n'.format(
                     sizeof_fmt(sys.getsizeof(tempArr))))
                 print('SHAPE: {}'.format(tempArr.shape))
+            
 
         u_array = np.mean(tempArr, axis=0)
         u_array_std = np.std(tempArr, axis=0)
