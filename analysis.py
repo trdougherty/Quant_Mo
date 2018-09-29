@@ -32,15 +32,14 @@ ap.add_argument("-o", "--output", required=False, dest='output',
                 help="path to output video file"),
 ap.add_argument("-d", "--difference", required=False, dest='difference', action='store_true',
                 help="yields discrepancy between arrays"),
-ap.add_argument("-e", "--evolution", required=False, dest='evolution', action='store_true',
-                help="shows the evolution of the motion development"),
+ap.add_argument("-e", "--evolution", help="show the evolution of the system"),
 ap.add_argument("-s", "--e_step", required=False, dest='evo_step', action='store_const',
                 help="resolution of the average video"),
 ap.set_defaults(input='.')
 ap.set_defaults(output='.')
-ap.set_defaults(difference=False)
-ap.set_defaults(evolution=True)
-ap.set_defaults(evo_step=3)
+ap.set_defaults(difference=False) 
+ap.set_defaults(evolution="evolution")
+ap.set_defaults(evo_step=50)
 args = vars(ap.parse_args())
 
 def process(file):
@@ -95,7 +94,6 @@ def saveTxt(u_array):
         for i in u_array:
             np.savetxt(outfile, i, fmt='%r')
 
-
 def reshapeHelp(arr):
     # This function converts the array into an added dimension to support concatenation later
     assert type(arr).__module__ == np.__name__
@@ -135,8 +133,20 @@ if __name__ == '__main__':
                 print('SIZE: {}\n'.format(
                     sizeof_fmt(sys.getsizeof(tempArr))))
                 print('SHAPE: {}'.format(tempArr.shape))
-            
 
+            if args["evolution"]: 
+                os.mkdir(str(os.getcwd())+"/"+str(args["evolution"])
+                fourcc = cv2.VideoWriter_fourcc(*'mp4v') # Be sure to use lower case
+                out_y = cv2.VideoWriter(str(os.getcwd()+"/"+str(args["evolution"])+"/"+str(args["evolution"])+"_y"+".avi"), fourcc, 20.0, (temp.shape[0], temp.shape[1]))
+                out_x = cv2.VideoWriter(str(os.getcwd()+"/"+str(args["evolution"])+"/"+str(args["evolution"])+"_x"+".avi"), fourcc, 20.0, (temp.shape[0], temp.shape[1]))
+
+            if args["evolution"] and c%int(args["e_step"])==0:
+                print("Saving evolution video")
+                A = np.mean(tempArr)
+                np.save(str(evolution)+str(c), A)
+                out_y.write(A[...,1])
+                out_x.write(A[...,0])
+            
         u_array = np.mean(tempArr, axis=0)
         u_array_std = np.std(tempArr, axis=0)
         print("\n-----------FINISHED PROCESSING-----------\n")
@@ -145,6 +155,8 @@ if __name__ == '__main__':
     print('FINAL ERROR: {}'.format(u_array_std))
     print('FINAL SIZE: {}'.format(sizeof_fmt(sys.getsizeof(u_array))))
     print('FINAL SHAPE: {}\n'.format(u_array.shape))
+
+    if args["evolution"]: out_y.release(); out_x.release();
 
     np.save(args["output"], u_array)
     np.save(args["output"]+"_std", u_array_std)
