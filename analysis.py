@@ -135,8 +135,8 @@ if __name__ == '__main__':
             if args["evolution"]: 
                 os.mkdir(str(os.getcwd())+"/"+str(args["evolution"]))
                 fourcc = cv2.VideoWriter_fourcc(*'mp4v') # Be sure to use lower case
-                out_y = cv2.VideoWriter(str(os.getcwd()+"/"+str(args["evolution"])+"/"+str(args["evolution"])+"_y"+".avi"), fourcc, 20.0, (temp.shape[0], temp.shape[1]))
-                out_x = cv2.VideoWriter(str(os.getcwd()+"/"+str(args["evolution"])+"/"+str(args["evolution"])+"_x"+".avi"), fourcc, 20.0, (temp.shape[0], temp.shape[1]))
+                out_y = cv2.VideoWriter(str(os.getcwd()+"/"+str(args["evolution"])+"/"+str(args["evolution"])+"_y"+".avi"), fourcc, 20.0, (temp[1].shape[0], temp[1].shape[1]))
+                out_x = cv2.VideoWriter(str(os.getcwd()+"/"+str(args["evolution"])+"/"+str(args["evolution"])+"_x"+".avi"), fourcc, 20.0, (temp[1].shape[0], temp[1].shape[1]))
 
             if args["evolution"] and c%int(args["e_step"])==0:
                 print("Saving evolution video")
