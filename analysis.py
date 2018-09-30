@@ -33,13 +33,11 @@ ap.add_argument("-o", "--output", required=False, dest='output',
 ap.add_argument("-d", "--difference", required=False, dest='difference', action='store_true',
                 help="yields discrepancy between arrays"),
 ap.add_argument("-e", "--evolution", help="show the evolution of the system"),
-ap.add_argument("-s", "--e_step", required=False, dest='evo_step', action='store_const',
-                help="resolution of the average video"),
+ap.add_argument("-s", "--e_step", required=False, help="resolution of the average video", type=int, nargs='?',                        const=50, default=None),
 ap.set_defaults(input='.')
 ap.set_defaults(output='.')
 ap.set_defaults(difference=False) 
 ap.set_defaults(evolution="evolution")
-ap.set_defaults(evo_step=50)
 args = vars(ap.parse_args())
 
 def process(file):
