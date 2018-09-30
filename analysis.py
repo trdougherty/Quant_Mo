@@ -143,6 +143,7 @@ if __name__ == '__main__':
             if args["evolution"] and c%int(args["e_step"])==0:
                 print("Saving evolution video")
                 A = np.mean(tempArr, axis=0)
+                print(A.shape)
                 np.save(str(args["evolution"])+str(c), A)
                 out_y.write(A[...,1])
                 out_x.write(A[...,0])
