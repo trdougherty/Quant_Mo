@@ -32,13 +32,28 @@ ap.set_defaults(difference=False)
 ap.set_defaults(evolution="evolution")
 args = vars(ap.parse_args())
 
-def process(file):
+def processLight(file):
     try:
         # This collapses the colors of the array into greyscale
         A = ndimage.imread(file)
         return np.sum(A, axis=len(A.shape)-1)
     except EOFError:
         return None
+
+def process(file, pattern):
+    try:
+        # Assumes shape of (X,X,i) for this array - otherwise unumpy array would be unable to cope
+        numObj = np.load(file)
+        [date, arr] = numObj
+        A = unumpy.matrix(arr.flatten())
+        A_nom = np.ravel(A.nominal_values)
+        outArr = np.reshape(A_nom, arr.shape)
+        return [date, outArr]
+    except EOFError:
+        return None
+
+def filterTime(files, pattern):
+    return [ x for x in files if pattern in x ]
 
 def sizeof_fmt(num, suffix='B'):
     # Took this from online to read how much RAM this is using
@@ -78,8 +93,7 @@ def reshapeHelp(arr):
     lis.insert(0, 1)
     return np.reshape(arr, tuple(lis)).astype('float16')
 
-def loadLight(light_a):
-
+def analyzeLight(light_a):
 
 
 if __name__ == '__main__':

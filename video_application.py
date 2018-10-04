@@ -61,7 +61,7 @@ def main():
     while(cap.isOpened()):
         try:
             ret, frame = cap.read()
-            print('Ret: {} and frame: {}'   .format(ret, frame))
+            print('Ret: {} and frame: {}'.format(ret, frame))
             if(initialized == False):
             #Builds the appropriate optical flow
                 of = flow.Flow(frame) #dense_hsv')
