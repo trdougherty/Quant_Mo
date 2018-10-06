@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-OpenCV OpticalFlow Showcase
+Quant Motion System
 ===========================
 
 ## Usage
@@ -42,5 +41,3 @@ For Raspberry Pi, run raspi_main.py.
 ## About code
 =======
 # Quant_Mo
-Quantitative Motion Analysis
->>>>>>> 24e7d8a70c2c155d9eb35286cbeca215e00f0ee8
