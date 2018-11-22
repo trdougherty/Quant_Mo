@@ -32,7 +32,7 @@ ap.add_argument("-o", "--output", required=False, dest='output',
                 help="path to output video file"),
 ap.add_argument("-d", "--difference", required=False, dest='difference', action='store_true',
                 help="yields discrepancy between arrays"),
-ap.add_argument("-e", "--evolution", help="show the evolution of the system"),
+ap.add_argument("-e", "--evolution", help="show the evolution of the system", default=False),
 ap.add_argument("-s", "--e_step", required=False, help="resolution of the average video", type=int, nargs='?',                        const=50, default=None),
 ap.set_defaults(input='.')
 ap.set_defaults(output='.')
@@ -60,6 +60,9 @@ def process(file):
         return [date, outArr]
     except EOFError:
         return None
+
+def filterTime(files, pattern):
+    return [ x for x in files if pattern in x ]
 
 def sizeof_fmt(num, suffix='B'):
     # Took this from online to read how much RAM this is using
@@ -132,7 +135,7 @@ if __name__ == '__main__':
                     sizeof_fmt(sys.getsizeof(tempArr))))
                 print('SHAPE: {}'.format(tempArr.shape))
 
-            if args["evolution"]: 
+            if args["evolution"] == True: 
                 evoPath = str(os.getcwd())+"/"+str(args["evolution"])
                 if not os.path.exists(evoPath):
                     os.mkdir(evoPath)
@@ -140,6 +143,16 @@ if __name__ == '__main__':
                 out_y = cv2.VideoWriter(str(os.getcwd()+"/"+str(args["evolution"])+"/"+str(args["evolution"])+"_y"+".avi"), fourcc, 20.0, (temp[1].shape[0], temp[1].shape[1]))
                 out_x = cv2.VideoWriter(str(os.getcwd()+"/"+str(args["evolution"])+"/"+str(args["evolution"])+"_x"+".avi"), fourcc, 20.0, (temp[1].shape[0], temp[1].shape[1]))
 
+<<<<<<< HEAD
+            if args["evolution"] == True:
+                if args["e_step"] != None and c%int(args["e_step"])==0:
+                    print("Saving evolution video")
+                    A = np.mean(tempArr, axis=0)
+                    A = A.astype(float)
+                    np.save(str(args["evolution"])+str(c), A)
+                    out_y.write(A[...,1])
+                    out_x.write(A[...,0])
+=======
             if args["evolution"] and c%int(args["e_step"])==0:
                 print("Saving evolution video")
                 A = np.mean(tempArr, axis=0)
@@ -147,6 +160,7 @@ if __name__ == '__main__':
                 np.save(str(args["evolution"])+str(c), A)
                 out_y.write(A[...,1])
                 out_x.write(A[...,0])
+>>>>>>> 694b7fd4777baacc2f595a790fe6eed265132207
             
         u_array = np.mean(tempArr, axis=0)
         u_array_std = np.std(tempArr, axis=0)
