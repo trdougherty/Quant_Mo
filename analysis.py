@@ -143,7 +143,6 @@ if __name__ == '__main__':
                 out_y = cv2.VideoWriter(str(os.getcwd()+"/"+str(args["evolution"])+"/"+str(args["evolution"])+"_y"+".avi"), fourcc, 20.0, (temp[1].shape[0], temp[1].shape[1]))
                 out_x = cv2.VideoWriter(str(os.getcwd()+"/"+str(args["evolution"])+"/"+str(args["evolution"])+"_x"+".avi"), fourcc, 20.0, (temp[1].shape[0], temp[1].shape[1]))
 
-<<<<<<< HEAD
             if args["evolution"] == True:
                 if args["e_step"] != None and c%int(args["e_step"])==0:
                     print("Saving evolution video")
@@ -152,15 +151,6 @@ if __name__ == '__main__':
                     np.save(str(args["evolution"])+str(c), A)
                     out_y.write(A[...,1])
                     out_x.write(A[...,0])
-=======
-            if args["evolution"] and c%int(args["e_step"])==0:
-                print("Saving evolution video")
-                A = np.mean(tempArr, axis=0)
-                A = A.astype(float)
-                np.save(str(args["evolution"])+str(c), A)
-                out_y.write(A[...,1])
-                out_x.write(A[...,0])
->>>>>>> 694b7fd4777baacc2f595a790fe6eed265132207
             
         u_array = np.mean(tempArr, axis=0)
         u_array_std = np.std(tempArr, axis=0)
