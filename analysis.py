@@ -46,16 +46,19 @@ def process(file):
     try:
         # Assumes shape of (X,X,i) for this array - otherwise unumpy array would be unable to cope
         if args["regex"] is not None:
-            p = re.compile(args["regrex"])
-            numObj = np.load(file)
-            [date, arr] = numObj
-            A = unumpy.matrix(arr.flatten())
-            # this SHOULD build a new array that's twice as big -
-            # but everything is float values instead of strings (yay) and alternates
-            # between nominal, std, nominal, std
-            A_nom = np.ravel(A.nominal_values)
-            outArr = np.reshape(A_nom, arr.shape)
-            return [date, outArr]
+            p = re.compile(args["regex"])
+            if p.match(file) is None:
+                return None #We need to think of a way to skip this
+        print(file)
+        numObj = np.load(file)
+        [date, arr] = numObj
+        A = unumpy.matrix(arr.flatten())
+        # this SHOULD build a new array that's twice as big -
+        # but everything is float values instead of strings (yay) and alternates
+        # between nominal, std, nominal, std
+        A_nom = np.ravel(A.nominal_values)
+        outArr = np.reshape(A_nom, arr.shape)
+        return [date, outArr]
     except EOFError:
         return None
 
@@ -135,10 +138,12 @@ if __name__ == '__main__':
     else:
         for c,i in enumerate(files):
             temp = process(i)
-            if temp:
+            if temp is not None or temp == True:
                 [temp_date, arr] = temp
                 dates.append(temp_date)
-                if type(tempArr) == np.ndarray and tempArr.size == 0::
+                print(tempArr.size)
+                if tempArr.size == 0:
+                    print('ok')
                     tempArr = reshapeHelp(arr)
                 else:
                     tempArr = np.concatenate([tempArr, reshapeHelp(arr)], axis=0)
@@ -173,7 +178,7 @@ if __name__ == '__main__':
     print('FINAL SIZE: {}'.format(sizeof_fmt(sys.getsizeof(u_array))))
     print('FINAL SHAPE: {}\n'.format(u_array.shape))
 
-    if args["evolution"]: out_y.release(); out_x.release();
+    if args["evolution"] == True: out_y.release(); out_x.release();
 
     np.save(args["output"], u_array)
     np.save(args["output"]+"_std", u_array_std)
