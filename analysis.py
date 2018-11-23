@@ -44,10 +44,11 @@ def process(file):
     try:
         # Assumes shape of (X,X,i) for this array - otherwise unumpy array would be unable to cope
         if args["regex"] is not None:
-            p = re.compile(str(args["regex"]))
-            print(args["regex"])
-            if p.match(file) is None:
+            p = re.compile(re.escape(str(args["regex"])))
+            if p.search(file) is None:
                 return None #We need to think of a way to skip this
+            else:
+                print(file)
         print(file)
         numObj = np.load(file)
         [date, arr] = numObj
