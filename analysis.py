@@ -31,8 +31,6 @@ ap.add_argument("-i", "--input", required=False, dest='input',
                 help="full path to the location of files"),
 ap.add_argument("-o", "--output", required=False, dest='output',
                 help="path to output video file"),
-ap.add_argument("-d", "--difference", required=False, dest='difference', action='store_true',
-                help="yields discrepancy between arrays"),
 ap.add_argument("-r", "--regex", help="define a regular expression for parsing through the folder", default=None, required=False),
 ap.add_argument("-e", "--evolution", help="show the evolution of the system", default=False),
 ap.add_argument("-s", "--e_step", required=False, help="resolution of the average video", type=int, nargs='?',                        const=50, default=None),
@@ -46,7 +44,8 @@ def process(file):
     try:
         # Assumes shape of (X,X,i) for this array - otherwise unumpy array would be unable to cope
         if args["regex"] is not None:
-            p = re.compile(args["regex"])
+            p = re.compile(str(args["regex"]))
+            print(args["regex"])
             if p.match(file) is None:
                 return None #We need to think of a way to skip this
         print(file)
@@ -138,7 +137,7 @@ if __name__ == '__main__':
     else:
         for c,i in enumerate(files):
             temp = process(i)
-            if temp is not None or temp == True:
+            if temp is not None:
                 [temp_date, arr] = temp
                 dates.append(temp_date)
                 print(tempArr.size)
@@ -169,9 +168,9 @@ if __name__ == '__main__':
                     out_y.write(A[...,1])
                     out_x.write(A[...,0])
 
-        u_array = np.mean(tempArr, axis=0)
-        u_array_std = np.std(tempArr, axis=0)
-        print("\n-----------FINISHED PROCESSING-----------\n")
+    u_array = np.mean(tempArr, axis=0)
+    u_array_std = np.std(tempArr, axis=0)
+    print("\n-----------FINISHED PROCESSING-----------\n")
 
     print('FINAL VALUES: {}\n'.format(u_array))
     print('FINAL ERROR: {}'.format(u_array_std))
