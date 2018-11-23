@@ -10,6 +10,7 @@ import datetime
 import ucert
 import os
 import pdb
+import re
 
 # print(resource.getrlimit(resource.RLIMIT_STACK))
 # print(sys.getrecursionlimit())
@@ -32,32 +33,29 @@ ap.add_argument("-o", "--output", required=False, dest='output',
                 help="path to output video file"),
 ap.add_argument("-d", "--difference", required=False, dest='difference', action='store_true',
                 help="yields discrepancy between arrays"),
+ap.add_argument("-r", "--regex", help="define a regular expression for parsing through the folder", default=None, required=False),
 ap.add_argument("-e", "--evolution", help="show the evolution of the system", default=False),
 ap.add_argument("-s", "--e_step", required=False, help="resolution of the average video", type=int, nargs='?',                        const=50, default=None),
 ap.set_defaults(input='.')
 ap.set_defaults(output='.')
-ap.set_defaults(difference=False) 
+ap.set_defaults(difference=False)
 ap.set_defaults(evolution="evolution")
 args = vars(ap.parse_args())
 
 def process(file):
     try:
         # Assumes shape of (X,X,i) for this array - otherwise unumpy array would be unable to cope
-        numObj = np.load(file)
-        [date, arr] = numObj
-        # newShape = list(arr.shape)
-        # newShape[-1] *= 2; 
-        # outArr = np.zeros(newShape, dtype='float16')
-        A = unumpy.matrix(arr.flatten())
-        # this SHOULD build a new array that's twice as big - 
-        # but everything is float values instead of strings (yay) and alternates 
-        # between nominal, std, nominal, std
-        A_nom = np.ravel(A.nominal_values)
-        outArr = np.reshape(A_nom, arr.shape)
-        # A_std = np.ravel(A.std_devs)
-        # outArr[...,::2] = np.reshape(A_nom, arr.shape)
-        # outArr[...,1::2] = np.reshape(A_std, arr.shape)
-        return [date, outArr]
+        if args["regex"] is not None:
+            p = re.compile(args["regrex"])
+            numObj = np.load(file)
+            [date, arr] = numObj
+            A = unumpy.matrix(arr.flatten())
+            # this SHOULD build a new array that's twice as big -
+            # but everything is float values instead of strings (yay) and alternates
+            # between nominal, std, nominal, std
+            A_nom = np.ravel(A.nominal_values)
+            outArr = np.reshape(A_nom, arr.shape)
+            return [date, outArr]
     except EOFError:
         return None
 
@@ -112,7 +110,21 @@ if __name__ == '__main__':
     iterat = 0
     tempArr = np.array([], dtype='float16')
 
+    # We probably want to put this in a post data analysis folder
+    # That folder will have dissection by date - so it'll recursively find the averages to show the evolution of the system
+    # We also probably want this to be segmenting by day and time
+    # Most likely have three folders doing most of the work
     print("Output is:\t{}".format(args["output"]))
+
+    #This builds our output data hub
+    outPath = str(os.getcwd())+"/outData"
+    if not os.path.exists(outPath):
+        os.mkdir(outPath)
+
+    #This builds the specific output folder for our desired experiment
+    specificOut = outPath+"/"+str(args["output"])
+    if not os.path.exists(specificOut):
+        os.mkdir(specificOut)
 
     if diff:
         # This will need to be modified in the future
@@ -126,7 +138,7 @@ if __name__ == '__main__':
             if temp:
                 [temp_date, arr] = temp
                 dates.append(temp_date)
-                if sys.getsizeof(tempArr) == 96:
+                if type(tempArr) == np.ndarray and tempArr.size == 0::
                     tempArr = reshapeHelp(arr)
                 else:
                     tempArr = np.concatenate([tempArr, reshapeHelp(arr)], axis=0)
@@ -135,7 +147,7 @@ if __name__ == '__main__':
                     sizeof_fmt(sys.getsizeof(tempArr))))
                 print('SHAPE: {}'.format(tempArr.shape))
 
-            if args["evolution"] == True: 
+            if args["evolution"] == True:
                 evoPath = str(os.getcwd())+"/"+str(args["evolution"])
                 if not os.path.exists(evoPath):
                     os.mkdir(evoPath)
@@ -151,7 +163,7 @@ if __name__ == '__main__':
                     np.save(str(args["evolution"])+str(c), A)
                     out_y.write(A[...,1])
                     out_x.write(A[...,0])
-            
+
         u_array = np.mean(tempArr, axis=0)
         u_array_std = np.std(tempArr, axis=0)
         print("\n-----------FINISHED PROCESSING-----------\n")
