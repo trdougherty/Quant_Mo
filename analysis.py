@@ -47,8 +47,6 @@ def process(file):
             p = re.compile(re.escape(str(args["regex"])))
             if p.search(file) is None:
                 return None #We need to think of a way to skip this
-            else:
-                print(file)
         print(file)
         numObj = np.load(file)
         [date, arr] = numObj
