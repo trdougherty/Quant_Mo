@@ -118,3 +118,4 @@ name
 physical_components/
 Light_Calibration/
 raw_files/
+nohup.out

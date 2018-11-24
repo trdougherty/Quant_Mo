@@ -11,6 +11,7 @@ import ucert
 import os
 import pdb
 import re
+import progressbar
 
 # print(resource.getrlimit(resource.RLIMIT_STACK))
 # print(sys.getrecursionlimit())
@@ -47,7 +48,7 @@ def process(file):
             p = re.compile(re.escape(str(args["regex"])))
             if p.search(file) is None:
                 return None #We need to think of a way to skip this
-        print(file)
+        #print(file)
         numObj = np.load(file)
         [date, arr] = numObj
         A = unumpy.matrix(arr.flatten())
@@ -110,6 +111,7 @@ if __name__ == '__main__':
     dates = []
     iterat = 0
     tempArr = np.array([], dtype='float16')
+    var_evolution = []
 
     # We probably want to put this in a post data analysis folder
     # That folder will have dissection by date - so it'll recursively find the averages to show the evolution of the system
@@ -134,21 +136,26 @@ if __name__ == '__main__':
         [b_date, b_arr] = np.load(files[1])
         u_array = b_arr - a_arr
     else:
+        widgets=[progressbar.Percentage(),' ', progressbar.Bar(),' ', progressbar.ETA()]
+        bar = progressbar.ProgressBar(widgets=widgets, max_value= len(files)).start()
         for c,i in enumerate(files):
+            bar.update(c+1)
             temp = process(i)
             if temp is not None:
                 [temp_date, arr] = temp
                 dates.append(temp_date)
-                print(tempArr.size)
+                #print(tempArr.size)
                 if tempArr.size == 0:
-                    print('ok')
+                    #print('ok')
                     tempArr = reshapeHelp(arr)
                 else:
                     tempArr = np.concatenate([tempArr, reshapeHelp(arr)], axis=0)
+                    var_x = tempArr.var(axis=0); var_y = tempArr.var(axis=1);
+                    var_evolution.append(var_x.mean()+var_y.mean())
 
-                print('SIZE: {}\n'.format(
-                    sizeof_fmt(sys.getsizeof(tempArr))))
-                print('SHAPE: {}'.format(tempArr.shape))
+                #print('SIZE: {}\n'.format(
+                #    sizeof_fmt(sys.getsizeof(tempArr))))
+                #print('SHAPE: {}'.format(tempArr.shape))
 
             if args["evolution"] == True:
                 evoPath = str(os.getcwd())+"/"+str(args["evolution"])
@@ -166,6 +173,7 @@ if __name__ == '__main__':
                     np.save(str(args["evolution"])+str(c), A)
                     out_y.write(A[...,1])
                     out_x.write(A[...,0])
+        bar.finish()
 
     u_array = np.mean(tempArr, axis=0)
     u_array_std = np.std(tempArr, axis=0)
@@ -177,6 +185,8 @@ if __name__ == '__main__':
     print('FINAL SHAPE: {}\n'.format(u_array.shape))
 
     if args["evolution"] == True: out_y.release(); out_x.release();
+    var_evolution = np.array(var_evolution)
 
     np.save(args["output"], u_array)
     np.save(args["output"]+"_std", u_array_std)
+    np.save(args["output"]+"_var", var_evolution)
