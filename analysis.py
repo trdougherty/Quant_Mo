@@ -150,8 +150,7 @@ if __name__ == '__main__':
                     tempArr = reshapeHelp(arr)
                 else:
                     tempArr = np.concatenate([tempArr, reshapeHelp(arr)], axis=0)
-                    var_x = tempArr.var(axis=0); var_y = tempArr.var(axis=1);
-                    var_evolution.append(var_x.mean()+var_y.mean())
+                    var_evolution.append(tempArr.var())
 
                 #print('SIZE: {}\n'.format(
                 #    sizeof_fmt(sys.getsizeof(tempArr))))
