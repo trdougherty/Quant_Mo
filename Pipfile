@@ -15,6 +15,7 @@ line-profiler = "*"
 memory-profiler = "*"
 dash = "==0.26.3"
 seaborn = "*"
+tqdm = "*"
 
 [dev-packages]
 matplotlib = "*"
