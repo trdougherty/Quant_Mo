@@ -51,7 +51,7 @@ if __name__ == "__main__":
 
     #print(lt_motion)
     for c,i in enumerate(motion_files):
-        print("On file:\t{} of total:\t{}".format(c, len(motion_files))
+        print("On file:\t{} of total:\t{}".format(c, len(motion_files)))
         mot = proc(data+'/'+i) #opens the data
         x, y, z = mot[1].shape # Gives us the shape of the object
         mot_date =  pd.to_datetime(mot[0], format='%Y-%m-%d %H:%M:%S.%f') # Gives us the dateimte
