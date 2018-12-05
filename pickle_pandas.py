@@ -19,7 +19,7 @@ import seaborn as sns
 import pandas as pd
 from tqdm import tqdm
 
-experiment = os.getcwd()+'/data/aw_motion/'
+experiment = os.getcwd()+ '/data/aw_motion/'
 data = experiment + 'data'
 pickled = experiment + 'pickled'
 photos = experiment + 'photos'
@@ -50,7 +50,7 @@ if __name__ == "__main__":
         motion_files = files
 
     #print(lt_motion)
-    for c,i in enumerate(motion_files[0:2]):
+    for c,i in enumerate(motion_files):
         mot = proc(data+'/'+i) #opens the data
         x, y, z = mot[1].shape # Gives us the shape of the object
         mot_date =  pd.to_datetime(mot[0], format='%Y-%m-%d %H:%M:%S.%f') # Gives us the dateimte
