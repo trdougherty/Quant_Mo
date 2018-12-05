@@ -35,30 +35,30 @@ def proc(file):
     outArr = np.reshape(A_nom, arr.shape)
     return [date, outArr]
 
-if __name__ == "__main__":
-    print('this was run')
-    if os.path.exists(pickled) is False:
-        os.makedirs(pickled)
-    if os.path.exists(photos) is False:
-        os.makedirs(photos)
 
-    print("Pickled Location is: {}".format(pickled))
+print('this was run')
+if os.path.exists(pickled) is False:
+    os.makedirs(pickled)
+if os.path.exists(photos) is False:
+    os.makedirs(photos)
 
-    lt_motion = pd.DataFrame([])
-    arr = ['Date','X','Y','xy','m']
-    lt_motion = pd.DataFrame(columns=arr)
-    for root, dirs, files in os.walk(data):
-        motion_files = files
+print("Pickled Location is: {}".format(pickled))
 
-    #print(lt_motion)
-    for c,i in enumerate(motion_files):
-        print("On file:\t{} of total:\t{}".format(c, len(motion_files)))
-        mot = proc(data+'/'+i) #opens the data
-        x, y, z = mot[1].shape # Gives us the shape of the object
-        mot_date =  pd.to_datetime(mot[0], format='%Y-%m-%d %H:%M:%S.%f') # Gives us the dateimte
-        for i in range(x):
-            for j in range(y):
-                for k in range(z):
-                    lt_motion.loc[c*x*y*z+i*y*z+j*y+k] = [mot_date,i,j,k,mot[1][i][j][k]]
+lt_motion = pd.DataFrame([])
+arr = ['Date','X','Y','xy','m']
+lt_motion = pd.DataFrame(columns=arr)
+for root, dirs, files in os.walk(data):
+    motion_files = files
 
-    lt_motion.to_pickle(pickled+'/aw_motion.pkl')
+#print(lt_motion)
+for c,i in enumerate(motion_files):
+    print("On file:\t{} of total:\t{}".format(c, len(motion_files)))
+    mot = proc(data+'/'+i) #opens the data
+    x, y, z = mot[1].shape # Gives us the shape of the object
+    mot_date =  pd.to_datetime(mot[0], format='%Y-%m-%d %H:%M:%S.%f') # Gives us the dateimte
+    for i in range(x):
+        for j in range(y):
+            for k in range(z):
+                lt_motion.loc[c*x*y*z+i*y*z+j*y+k] = [mot_date,i,j,k,mot[1][i][j][k]]
+
+lt_motion.to_pickle(pickled+'/aw_motion.pkl')
