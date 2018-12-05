@@ -19,7 +19,7 @@ import seaborn as sns
 import pandas as pd
 from tqdm import tqdm
 
-experiment = '/Users/TRD/Research_Personal/Quant_Mo/data/aw_motion/'
+experiment = os.getcwd()+'/data/aw_motion/'
 data = experiment + 'data'
 pickled = experiment + 'pickled'
 photos = experiment + 'photos'
@@ -40,6 +40,8 @@ if __name__ == "__main__":
         os.makedirs(pickled)
     if os.path.exists(photos) is False:
         os.makedirs(photos)
+
+    print("Pickled Location is: {}".format(pickled))
 
     lt_motion = pd.DataFrame([])
     arr = ['Date','X','Y','xy','m']
