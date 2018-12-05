@@ -36,6 +36,7 @@ def proc(file):
     return [date, outArr]
 
 if __name__ == "__main__":
+    print('this was run')
     if os.path.exists(pickled) is False:
         os.makedirs(pickled)
     if os.path.exists(photos) is False:
