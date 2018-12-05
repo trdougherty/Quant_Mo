@@ -1,3 +1,5 @@
+print('stage1')
+
 # from __future__ import print_function
 import time
 import numpy as np
@@ -18,6 +20,8 @@ import ucert
 import seaborn as sns
 import pandas as pd
 from tqdm import tqdm
+
+print('stage2')
 
 experiment = os.getcwd()+ '/data/aw_motion/'
 data = experiment + 'data'
