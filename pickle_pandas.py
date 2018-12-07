@@ -50,8 +50,7 @@ if __name__ == "__main__":
         motion_files = files
 
     #print(lt_motion)
-    for c,i in enumerate(motion_files[0:2]):
-        print(c)
+    for c,i in enumerate(motion_files):
         print("On file:\t{} of total:\t{}".format(c, len(motion_files)))
         mot = proc(data+'/'+i) #opens the data
         x, y, z = mot[1].shape # Gives us the shape of the object
