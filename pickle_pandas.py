@@ -60,5 +60,5 @@ if __name__ == "__main__":
             for j in range(y):
                 for k in range(z):
                     lt_motion.loc[(c*x*y*z)+i*y*z+j*z+k] = [mot_date,i,j,k,mot[1][i][j][k]]
-            lt_motion.to_pickle(pickled+'/aw_motion.pkl')
-        lt_motion.to_pickle(pickled+'/aw_motion.pkl')
+            lt_motion.to_pickle(pickled+'/full_motion.pkl')
+        lt_motion.to_pickle(pickled+'/full_motion.pkl')
