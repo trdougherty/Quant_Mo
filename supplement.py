@@ -59,3 +59,4 @@ def floaty(*args):
         else:
             raise ValueError
     return ret
+
