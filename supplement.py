@@ -51,3 +51,11 @@ def reshapeHelp(arr):
     lis.insert(0, 1)
     return np.reshape(arr, tuple(lis)).astype('float16')
 
+def floaty(*args):
+    ret = []
+    for i in args:
+        if type(i) is np.ndarray: 
+            ret.append(i.astype('float64'))
+        else:
+            raise ValueError
+    return ret
