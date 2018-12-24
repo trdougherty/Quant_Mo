@@ -1,4 +1,6 @@
 # from __future__ import print_function
+
+## This file is used to pickle photos into the pixel data for each photo to study how the pixel behavior is changing over time
 import time
 import numpy as np
 import argparse

@@ -1,4 +1,5 @@
 import numpy as np
+from uncertainties import unumpy
 
 def edge(arr, scope):
     if len(scope) == 2:
@@ -42,4 +43,11 @@ def importMatrix(file):
 # Shouldn't really be needed
 def normalize(x):
     return x/np.amax(np.absolute(x))
+
+def reshapeHelp(arr):
+    # This function converts the array into an added dimension to support concatenation later
+    assert type(arr).__module__ == np.__name__
+    lis = list(arr.shape)
+    lis.insert(0, 1)
+    return np.reshape(arr, tuple(lis)).astype('float16')
 
