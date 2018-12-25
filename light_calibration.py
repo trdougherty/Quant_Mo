@@ -3,6 +3,7 @@ import os
 import supplement as sp
 import pandas as pd
 import seaborn as sns
+from tqdm import tqdm
 
 experiment = '/Users/TRD/Research_Personal/Light-Barometer/data/elles/'
 
@@ -26,14 +27,14 @@ A = np.load(full_files[0], encoding='latin1')
 
 ## Sets the datetime values in the pandas array for filtering later
 tee = [ i.strip('.npy').split('@',1)[-1] for i in files ]
-light = pd.DataFrame({'filename': full_files,'date': tee})
+light = pd.DataFrame({'filename': files,'date': tee})
 light['date'] = pd.to_datetime(light['date'], format='%Y-%m-%d.%H:%M:%S')
 light['hour'] = pd.DatetimeIndex(light['date']).hour
+dis_hours = sorted(light['hour'].drop_duplicates().values)
 
-HOURS = 24
 my_min = my_max = 0
 max_hour = min_hour = 0
-for HOUR in range(HOURS):
+for HOUR in dis_hours:
     outfile = str(HOUR)
     e_name = 'aw_light'
     filtered = light[light['hour']==HOUR]['filename'].values
@@ -45,18 +46,19 @@ for HOUR in range(HOURS):
     else:
         tempArr = np.array([], dtype='float16')
         for i in tqdm(filtered):
-            temp = sp.process(i)
-            if temp is not None:
-                [temp_date, heat_arr, light_arr] = temp
+            [date, heat_arr, light_arr] = sp.process(i, data)
+            if light_arr is not None:
                 if tempArr.size == 0:
-                    tempArr = reshapeHelp(light_arr)
+                    tempArr = sp.reshapeHelp(light_arr)
                 else:
-                    tempArr = np.concatenate([tempArr, reshapeHelp(light_arr)], axis=0)
+                    tempArr = np.concatenate([tempArr, sp.reshapeHelp(light_arr)], axis=0)
         
         M = np.mean(tempArr, axis=0)
         np.save(filt+'/'+outfile+e_name, M)
         
 # Going to be looking for max and mins between the arrays
+'''
+
 '''
 for HOUR in range(HOURS):
     outfile = str(HOUR)
@@ -84,5 +86,4 @@ for HOUR in range(HOURS):
         max_hour = HOUR
         '''
             
-print("Information about the max values: INDEX {}\t VALUE {}".format(max_hour, my_max))
-print("Information about the min values: INDEX {}\t VALUE {}".format(min_hour, my_min))
+print("Completed process")

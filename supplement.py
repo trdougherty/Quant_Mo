@@ -19,10 +19,13 @@ def pythag(arr):
         finalArr += np.power(arr[...,i], 2)
     return np.power(finalArr, 0.5)
 
-def process(file):
+def process(file, path_name):
     try:
-        numObj = np.load(data+'/'+file)
-        [date, arr] = numObj
+        numObj = np.load(path_name+'/'+file, encoding='latin1')
+        try:
+            [date, arr] = numObj
+        except ValueError:
+            return numObj
         A = unumpy.matrix(arr.flatten())
         A_nom = np.ravel(A.nominal_values)
         outArr = np.reshape(A_nom, arr.shape)
