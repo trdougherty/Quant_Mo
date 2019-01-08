@@ -1,5 +1,8 @@
 import numpy as np
 from uncertainties import unumpy
+import pandas as pd
+from tqdm import tqdm
+import os
 
 def edge(arr, scope):
     if len(scope) == 2:
@@ -62,3 +65,61 @@ def floaty(*args):
         else:
             raise ValueError
     return ret
+
+def chunk_hours(inp, outp, e_name='aw_motion'):
+    motion_files = [f for f in os.listdir(inp) if os.path.isfile(os.path.join(inp, f))]
+    HOURS = 24
+    my_min = my_max = 0
+    max_hour = min_hour = 0
+    for HOUR in range(HOURS):
+        # This is doing all the formatting we need
+        outfile = str(HOUR)
+        tee = [ i.strip('.npy').split('@',1)[-1] for i in motion_files ]
+        dates = pd.DataFrame({'filename': motion_files,'date': tee})
+        dates['date'] = pd.to_datetime(dates['date'], format='%Y-%m-%d.%H:%M:%S')
+        dates['hour'] = pd.DatetimeIndex(dates['date']).hour
+        filtered = dates[dates['hour']==HOUR]['filename'].values
+        print(filtered)
+        f_name = outp+'/'+outfile+e_name+'.npy'
+        # This loads the file if need
+        if os.path.isfile(f_name):
+            M = np.load(f_name)
+        # This builds a new file if need
+        else:
+            tempArr = np.array([], dtype='float16')
+            for i in tqdm(filtered):
+                temp = process(i)
+                if temp is not None:
+                    [temp_date, arr] = temp
+                    if tempArr.size == 0:
+                        tempArr = reshapeHelp(arr)
+                    else:
+                        tempArr = np.concatenate([tempArr, reshapeHelp(arr)], axis=0)
+            M = np.mean(tempArr, axis=0)
+            np.save(outp+'/'+outfile+e_name, M)
+        
+    # Going to be looking for max and mins between the arrays
+    for HOUR in range(HOURS):
+        outfile = str(HOUR)
+        if HOUR == 0:
+            a_file = str(HOUR+1)
+            b_file = '0'
+        elif HOUR == HOURS-1:
+            a_file = str(HOURS-1)
+            b_file = str(HOUR-1)
+        else:
+            a_file = str(HOUR+1)
+            b_file = str(HOUR-1)
+        
+        f_name = outp+'/'+outfile+e_name+'.npy';
+        b_name = outp+'/'+b_file+e_name+'.npy';
+        a_name = outp+'/'+a_file+e_name+'.npy';
+        N = np.load(f_name); 
+        N_a = np.load(a_name); 
+        N_b = np.load(b_name)
+        if np.amin(N-N_a) < my_min or np.amin(N-N_b) < my_min:
+            my_min = np.amin(M)
+            min_hour = HOUR
+        if np.amax(N-N_a) > my_max or np.amax(N-N_b) > my_max:
+            my_max = np.amax(M)
+            max_hour = HOUR
