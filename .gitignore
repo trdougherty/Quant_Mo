@@ -107,6 +107,7 @@ venv.bak/
 # Files to ignore
 videos/
 data/aw_motion/data/
+data_backup/
 .DS_Store
 *.jpg
 *.avi
