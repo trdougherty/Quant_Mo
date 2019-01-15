@@ -111,7 +111,6 @@ data_backup/
 .DS_Store
 *.jpg
 *.avi
-*.npy
 *.h5
 *.p
 *.zip
