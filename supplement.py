@@ -66,7 +66,20 @@ def floaty(*args):
             raise ValueError
     return ret
 
+def set_paths(experiment, e_name='aw_motion'):
+    data = experiment + 'data'
+    pickled = experiment + 'pickled'
+    photos = experiment + 'photos'
+    filt = experiment + 'filt'
+    if os.path.exists(pickled) is False:
+        os.makedirs(pickled)
+    if os.path.exists(photos) is False:
+        os.makedirs(photos)
+    if os.path.exists(filt) is False:
+        os.makedirs(filt)
+
 def chunk_hours(inp, outp, e_name='aw_motion'):
+    set_paths(inp, e_name)
     motion_files = [f for f in os.listdir(inp) if os.path.isfile(os.path.join(inp, f))]
     HOURS = 24
     my_min = my_max = 0
@@ -79,8 +92,8 @@ def chunk_hours(inp, outp, e_name='aw_motion'):
         dates['date'] = pd.to_datetime(dates['date'], format='%Y-%m-%d.%H:%M:%S')
         dates['hour'] = pd.DatetimeIndex(dates['date']).hour
         filtered = dates[dates['hour']==HOUR]['filename'].values
-        print(filtered)
         f_name = outp+'/'+outfile+e_name+'.npy'
+        print(f_name)
         # This loads the file if need
         if os.path.isfile(f_name):
             M = np.load(f_name)
@@ -88,7 +101,7 @@ def chunk_hours(inp, outp, e_name='aw_motion'):
         else:
             tempArr = np.array([], dtype='float16')
             for i in tqdm(filtered):
-                temp = process(i)
+                temp = process(i, inp)
                 if temp is not None:
                     [temp_date, arr] = temp
                     if tempArr.size == 0:
@@ -111,9 +124,9 @@ def chunk_hours(inp, outp, e_name='aw_motion'):
             a_file = str(HOUR+1)
             b_file = str(HOUR-1)
         
-        f_name = outp+'/'+outfile+e_name+'.npy';
-        b_name = outp+'/'+b_file+e_name+'.npy';
-        a_name = outp+'/'+a_file+e_name+'.npy';
+        f_name = outp+'/'+outfile+e_name+'.npy'
+        b_name = outp+'/'+b_file+e_name+'.npy'
+        a_name = outp+'/'+a_file+e_name+'.npy'
         N = np.load(f_name); 
         N_a = np.load(a_name); 
         N_b = np.load(b_name)
