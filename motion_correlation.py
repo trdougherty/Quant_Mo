@@ -42,6 +42,11 @@ L = np.load(l_name)
 
 # This is looking at the raw influence of light on the motion of the frame
 data_setup = {'light':L.flatten(), 'motion':np.sum(np.absolute(M), axis=2).flatten()}
-print(L.shape)
 df = pd.DataFrame(data=data_setup)
-print(df)
+if len(sys.argv) > 1:
+    if str(sys.argv[1]) == '0':
+        print(df.light.to_string(index=False))
+    else:
+        print(df.motion.to_string(index=False))
+else:
+    pass
