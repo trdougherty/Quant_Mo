@@ -4,9 +4,9 @@ import pandas as pd
 import sys
 
 ## This is specific to this machine and experiment, should be replaced with config file if published
-experiment = '/Users/TRD/Research_Personal/Quant_Mo/data/aw_motion/'
-light_e = '/Users/TRD/Research_Personal/Light-Barometer/data/elles/data/'
-light_h = '/Users/TRD/Research_Personal/Light-Barometer/data/elles/filt/'
+experiment = 'data/aw_motion/'
+light_e = 'data/elles/data/'
+light_h = 'data/elles/filt/'
 e_name = 'aw_motion'
 l_nam = 'aw_light'
 data = experiment + 'data'
@@ -28,6 +28,7 @@ L = np.load(l_name)
 # This is looking at the raw influence of light on the motion of the frame
 data_setup = {'light':L.flatten(), 'motion':np.sum(np.absolute(M), axis=2).flatten()}
 df = pd.DataFrame(data=data_setup)
+df_corr = df.corr() # This is going to give us a correlation matrix to play with
 if len(sys.argv) > 1:
     if str(sys.argv[1]) == '0':
         print(df.light.to_string(index=False))
@@ -35,3 +36,5 @@ if len(sys.argv) > 1:
         print(df.motion.to_string(index=False))
 else:
     pass
+
+#print(df_corr)
