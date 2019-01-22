@@ -23,7 +23,7 @@ h = str(hour)
 f_name = filt+'/'+h+e_name+'.npy'
 l_name = light_h+h+l_nam+'.npy'
 M = np.load(f_name); # This should always work if the line before was run
-L = np.load(l_name)
+L = np.load(l_name); L = np.rot90(L); # This rot is to make the images follow the same pattern
 
 # This is looking at the raw influence of light on the motion of the frame
 data_setup = {'light':L.flatten(), 'motion':np.sum(np.absolute(M), axis=2).flatten()}
