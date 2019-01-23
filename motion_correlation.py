@@ -37,8 +37,8 @@ for h in range(24):
 
         # This is trimming our analysis to the good data
         front = 0.3; back = 0.74
-        light_red = spp.edge(light_red, (front, back))
-        motion_red = spp.edge(motion_red, (front, back))
+        #light_red = spp.edge(light_red, (front, back))
+        #motion_red = spp.edge(motion_red, (front, back))
 
         # This is looking at how the change in values is related to the other values
         light_change = np.gradient(light_red)
@@ -49,11 +49,12 @@ for h in range(24):
         df = pd.DataFrame(data=data_setup)
 
         # This next line removes outliers
-        # df = df[(np.abs(stats.zscore(df)) < 3).all(axis=1)]
+        df = df[(np.abs(stats.zscore(df)) < 3).all(axis=1)]
         df.to_pickle(p_name)
 
         df_corr = df.corr() # This is going to give us a correlation matrix to play with
         print(df_corr)
+        print()
     except ValueError:
         pass
 
