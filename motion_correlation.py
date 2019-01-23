@@ -42,7 +42,6 @@ for h in range(24):
 
         # This is looking at how the change in values is related to the other values
         light_change = np.gradient(light_red)
-        print(light_change)
         motion_change = np.gradient(motion_red)
 
         data_setup = {'light':light_red.flatten(), 'light_dx':light_change[0].flatten(), 'light_dy':light_change[1].flatten(), 'raw_motion':motion_red.flatten(), 'motion_dx':motion_change[0].flatten(), 'motion_dy':motion_change[1].flatten()}
@@ -50,7 +49,7 @@ for h in range(24):
         df = pd.DataFrame(data=data_setup)
 
         # This next line removes outliers
-        df = df[(np.abs(stats.zscore(df)) < 3).all(axis=1)]
+        # df = df[(np.abs(stats.zscore(df)) < 3).all(axis=1)]
         df.to_pickle(p_name)
 
         df_corr = df.corr() # This is going to give us a correlation matrix to play with
