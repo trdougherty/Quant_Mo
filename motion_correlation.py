@@ -15,10 +15,10 @@ light_h = 'data/light_filt/'
 e_name = 'aw_motion'
 l_nam = 'aw_light'
 p_nam = 'all_data'
-data = experiment + 'data'
+data = experiment+'data'
 pickled = 'data/pickled'
-photos = experiment + 'photos'
-filt = experiment + 'filt'
+photos = experiment+'photos'
+filt = experiment+'filt'
 
 for h in range(24):
     try:
