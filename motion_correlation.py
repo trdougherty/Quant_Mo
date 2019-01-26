@@ -30,22 +30,19 @@ for h in range(24):
 
         M = np.load(f_name); # This should always work if the line before was run
         L = np.load(l_name); L = np.rot90(L); # This rot is to make the images follow the same pattern
-
         # This is looking at the raw influence of light on the motion of the frame
-        light_red = gaussian_filter(np.rot90(L, k=3).astype(int), sigma=3)
+        light_red = gaussian_filter(np.rot90(L, k=3).astype(int), sigma=7)
         motion_red = np.sum(np.absolute(M), axis=2)
-
         # This is trimming our analysis to the good data
         front = 0.3; back = 0.74
-        #light_red = spp.edge(light_red, (front, back))
-        #motion_red = spp.edge(motion_red, (front, back))
+        light_red = spp.edge(light_red, (front, back))
+        motion_red = spp.edge(motion_red, (front, back))
 
         # This is looking at how the change in values is related to the other values
         light_change = np.gradient(light_red)
         motion_change = np.gradient(motion_red)
 
         data_setup = {'light':light_red.flatten(), 'light_dx':light_change[0].flatten(), 'light_dy':light_change[1].flatten(), 'raw_motion':motion_red.flatten(), 'motion_dx':motion_change[0].flatten(), 'motion_dy':motion_change[1].flatten()}
-
         df = pd.DataFrame(data=data_setup)
 
         # This next line removes outliers
@@ -54,7 +51,6 @@ for h in range(24):
 
         df_corr = df.corr() # This is going to give us a correlation matrix to play with
         print(df_corr)
-        print()
     except ValueError:
         pass
 

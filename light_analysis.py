@@ -7,7 +7,6 @@ import argparse
 import io
 import sys
 import datetime
-import ucert
 import os
 import pdb
 from scipy import ndimage
@@ -40,7 +39,7 @@ def processLight(file):
     except EOFError:
         return None
 
-def process(file, pattern):
+def process(file):
     try:
         # Assumes shape of (X,X,i) for this array - otherwise unumpy array would be unable to cope
         numObj = np.load(file)
@@ -92,9 +91,6 @@ def reshapeHelp(arr):
     lis = list(arr.shape)
     lis.insert(0, 1)
     return np.reshape(arr, tuple(lis)).astype('float16')
-
-def analyzeLight(light_a):
-
 
 if __name__ == '__main__':
     diff = args["difference"]
