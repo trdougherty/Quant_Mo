@@ -23,25 +23,23 @@ photos = experiment+'photos'
 filt = experiment+'filt'
 
 files = os.listdir(data)
-for h in range(24):
+
+def out_loop(h):
     filtered = list(filter(lambda nam: int(nam.split('.')[1].split(':')[0]) == h, files))
-    l_name = light_h+str(h)+l_nam+'.npy'
-    p_name = pickled+str(h)+p_nam+'.pkl'
+
     if str(h)+p_nam+'.pkl' in os.listdir(pickled):
         print('Hour {} processed.'.format(h))
-        continue
+        return None
     
     for c,i in enumerate(filtered):
-        [date, M] = la.process(data+'/'+i); # This should always work if the line before was run
-        print(M[1])
         try:
-            L = np.load(l_name); L = np.rot90(L); 
+            [date, M] = la.process(data+'/'+i)
+            L = np.load(l_name)
+            light_red = gaussian_filter(np.rot90(L, k=3).astype(int), sigma=7)
+            motion_red = np.sum(np.absolute(M), axis=2)
         except ValueError:
-            pass# This rot is to make the images follow the same pattern
-        # This is looking at the raw influence of light on the motion of the frame
-        light_red = gaussian_filter(np.rot90(L, k=3).astype(int), sigma=7)
-        motion_red = np.sum(np.absolute(M), axis=2)
-        # # This is trimming our analysis to the good data
+            return None #This rot is to make the images follow the same pattern
+
         front = 0.3; back = 0.74
         light_red = spp.edge(light_red, (front, back))
         motion_red = spp.edge(motion_red, (front, back))
@@ -59,12 +57,29 @@ for h in range(24):
         else:
             data_setup = {'light':l, 'light_dx':l_cx, 'light_dy':l_cy, 'raw_motion':m, 'motion_dx':m_cx, 'motion_dy':m_cy}
             dapp = pd.DataFrame(data=data_setup)
-            df.append(dapp)
+            df = pd.concat([df, dapp])
+        
+        print('Hour {}\nIter: {}\nShap: {}\n\n'.format(h,c,df.shape))
+    
+    return df
 
-        # This next line removes outliers
-    df = df[(np.abs(stats.zscore(df)) < 3).all(axis=1)]
+for h in range(24):
+    # This is just for the naming of the files
+    l_name = light_h+str(h)+l_nam+'.npy'
+    p_name = pickled+str(h)+p_nam+'.pkl'
+
+    # Main meat of the function
+    df = out_loop(h)
+    if df is None:
+        print('Skipping hour {}...'.format(h))
+        continue
+
+    #Saving the file
     df.to_pickle(p_name)
+    print("Hour {}".format(h))
     print(df)
+    print("")
+    #print(df)
 
     # df_corr = df.corr() # This is going to give us a correlation matrix to play with
 

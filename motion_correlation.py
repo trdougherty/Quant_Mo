@@ -42,15 +42,21 @@ for h in range(24):
         light_change = np.gradient(light_red)
         motion_change = np.gradient(motion_red)
 
-        data_setup = {'light':light_red.flatten(), 'light_dx':light_change[0].flatten(), 'light_dy':light_change[1].flatten(), 'raw_motion':motion_red.flatten(), 'motion_dx':motion_change[0].flatten(), 'motion_dy':motion_change[1].flatten()}
+        # This is the dot product similarity concept we're interested in discovering
+        light_mat = np.concatenate((light_change[0][...,np.newaxis],light_change[1][...,np.newaxis]), axis=2)
+        motion_mat = np.concatenate((motion_change[0][...,np.newaxis],motion_change[1][...,np.newaxis]), axis=2)
+        similarity = np.zeros_like(motion_mat[...,0])
+        for i in range(motion_mat.shape[0]):
+            for j in range(motion_mat.shape[1]):
+                similarity[i,j] = light_mat[i,j]@motion_mat[i,j]
+
+        data_setup = {'light':light_red.flatten(), 'light_dx':light_change[0].flatten(), 'light_dy':light_change[1].flatten(), 'raw_motion':motion_red.flatten(), 'motion_dx':motion_change[0].flatten(), 'motion_dy':motion_change[1].flatten(), 'similarity':similarity.flatten()}
         df = pd.DataFrame(data=data_setup)
+        print(df.head())
+        print()
 
         # This next line removes outliers
-        df = df[(np.abs(stats.zscore(df)) < 3).all(axis=1)]
         df.to_pickle(p_name)
-
-        df_corr = df.corr() # This is going to give us a correlation matrix to play with
-        print(df_corr)
     except ValueError:
         pass
 
