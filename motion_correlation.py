@@ -33,6 +33,7 @@ for h in range(24):
         # This is looking at the raw influence of light on the motion of the frame
         light_red = gaussian_filter(np.rot90(L, k=3).astype(int), sigma=7)
         motion_red = np.sum(np.absolute(M), axis=2)
+
         # This is trimming our analysis to the good data
         front = 0.3; back = 0.74
         light_red = spp.edge(light_red, (front, back))
